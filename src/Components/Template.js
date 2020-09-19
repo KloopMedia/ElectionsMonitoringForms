@@ -61,15 +61,18 @@ class Template extends Component {
   
     uploadData = () => {
       try {
-        let rootRef = firebase.database().ref().child('RE:Message')
-        let userRef = rootRef.child(this.context.currentUser.uid)
-        let usernameRef = userRef.child("Username")
-        usernameRef.set(this.context.currentUser.displayName)
-        let emailRef = userRef.child("Email")
-        emailRef.set(this.context.currentUser.email)
-        let formRef = userRef.child(this.state.main_title)
-        let answerRef = formRef.child("Answers")
-        answerRef.push(this.state.answers)
+        let rootRef = firebase.firestore().collection("responses")
+        let userRef = rootRef.doc(this.context.currentUser.uid)
+        let answersRef = userRef.collection("answers")
+        answersRef.add(
+          {
+            answers: this.state.answers,
+            form_name: this.state.main_title,
+            form_url: this.props.url,
+            date: new Date()
+          }
+        ).catch(error => alert(error))
+        
         console.log("data uploaded")
         this.setState({showAnswers: true})
         this.setState({showFileUpload: true})
@@ -132,12 +135,7 @@ class Template extends Component {
   
     returnAnswer = (answer, index, id = null) => {
       let answers = {...this.state.answers}
-      if (this.state.questions[index].attachMaterials) {
-        answers[index] = {a: answer, m: ""}
-      }
-      else {
-        answers[index] = answer
-      }
+      answers[index] = answer
       this.setState({answers: answers})
 
       let shortAnswers = {...this.state.shortAnswers}

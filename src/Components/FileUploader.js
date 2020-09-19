@@ -3,42 +3,31 @@ import firebase from '../util/Firebase';
 import "../App.css"
 import { AuthContext } from "../util/Auth";
 
-import TextInput from "./form/textInput";
-import SelectBox from "./form/selectBox";
-import RadioButton from "./form/radiobutton";
-import TimePickers from "./form/timePickers";
-import RadioHorizontal from "./form/radioHorizontal";
-import { Link, BrowserRouter as Router, withRouter, Redirect } from 'react-router-dom';
-
 const queryString = require('query-string');
 
 class FileUploader extends Component {
     state = {
       questions: [],
       main_title: '',
-      gateway: '',
       answers: {},
-      shortAnswers: {},
+      id: "",
       showAnswers: false,
-      response: {},
       period: null,
       locked: false,
-      files: [],
       showFileUpload: false
     }
 
     static contextType = AuthContext
   
     componentDidMount() {
-        this.downloadData()
-        
+      this.loadAttachmentQuestions()
     }
 
-    downloadData = () => {
+    downloadData = (url) => {
         let urlString = queryString.parse(window.location.search, {decode: false})
-        if (urlString.url) {
+        if (url) {
           console.log(urlString)
-            fetch(urlString.url)
+            fetch(url)
                 .then((response) => {
                     return response.json();
                 })
@@ -47,13 +36,11 @@ class FileUploader extends Component {
                     this.setState({
                         questions: data.questions,
                         main_title: data.main_title,
-                        gateway: data.gateway,
                         period: data.period
                     })
                     if (data.period) {
                       this.timeManager(data)
                     }
-                    this.loadAttachmentQuestions()
                 });
         } else {
             console.log("ERROR: no url detected")
@@ -61,48 +48,42 @@ class FileUploader extends Component {
     }
 
     loadAttachmentQuestions = () => {
-      let rootRef = firebase.database().ref().child('RE:Message')
-      let userRef = rootRef.child(this.context.currentUser.uid)
-      let formRef = userRef.child(this.state.main_title)
-      let answerRef = formRef.child("Answers")
-
-      answerRef.on('value', snap => {
-        if (snap.val()) {
-          let answersList = Object.values(snap.val())
-          let answer = answersList[answersList.length - 1]
-          for (const [key, value] of Object.entries(answer)) {
-            if (value.m === "") {
-              let file = [...this.state.files]
-              file.push(key)
-              this.setState({files: file})
-           }
-         }
-        }
+      let rootRef = firebase.firestore().collection('responses')
+      let userRef = rootRef.doc(this.context.currentUser.uid)
+      let answersRef = userRef.collection("answers")
+      answersRef.orderBy("date", "desc").limit(1).get().then(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          console.log(doc.id, " => ", doc.data());
+          if (doc && doc.exists) {
+            this.setState({answers: doc.data()})
+            this.setState({id: doc.id})
+            this.downloadData(doc.data().form_url)
+          }
+        });
       })
       this.setState({showFileUpload: true})
     }
 
-    uploadFiles = (event, title) => {
-      const storageRef = firebase.storage().ref().child("Forms_files");
-      const userRef = storageRef.child(this.context.currentUser.uid)
-      const formRef = userRef.child(this.state.main_title)
-      const questionRef = formRef.child(title)
+    uploadFiles = (event, index) => {
+      const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
 
       const files = event.target.files
       Array.from(files).forEach(file => {
-        const fileRef = questionRef.child(file.name)
+        const fileRef = storageRef.child(file.name)
         const task = fileRef.put(file)
         task
-        .then(snapshot => {
-          let rootRef = firebase.database().ref().child('RE:Message')
-          let userRef = rootRef.child(this.context.currentUser.uid)
-          let formRef = userRef.child(this.state.main_title)
-          let filepathsRef = formRef.child("Filepaths")
-          filepathsRef.push(snapshot.metadata.fullPath)
-          return snapshot.ref.getDownloadURL()
-        })
+        .then(snapshot => snapshot.ref.getDownloadURL())
         .then((url) => {
-          console.log(url);
+          let rootRef = firebase.firestore().collection("responses")
+          let userRef = rootRef.doc(this.context.currentUser.uid)
+          let filesRef = userRef.collection("files")
+          filesRef.add(
+            {
+              filepath: url,
+              answer_number: index,
+              answer_id: this.state.id
+            }
+          ).catch(error => alert(error))
         })
         .catch(console.error);
       })
@@ -133,14 +114,13 @@ class FileUploader extends Component {
       return (
         <div>
           <h1 className="text-align-center">{this.state.main_title}</h1>
-          {this.state.files.map((key, i) => {
-            let el = this.state.questions[key]
-            console.log(key)
+          {this.state.questions.map((el, index) => {
             return (
-              <div key={i}>
+              el.attachMaterials ?
+              <div key={index}>
                 <h5>{el.title}</h5>
-                <input disabled={this.state.locked} type="file" name="filefield" multiple="multiple" onChange={(e) => this.uploadFiles(e, key.toString())} />
-              </div>
+                <input disabled={this.state.locked} type="file" name="filefield" multiple="multiple" onChange={(e) => this.uploadFiles(e, index.toString())} />
+              </div> : null
           )})}
           {this.state.showAnswers ? <p style={{textAlign: "left"}}>Full answers: {JSON.stringify(this.state.answers)}</p> : null}
           {this.state.showAnswers ? <p style={{textAlign: "left"}}>Short answers: {JSON.stringify(this.state.shortAnswers)}</p> : null}

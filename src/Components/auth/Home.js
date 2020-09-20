@@ -45,11 +45,11 @@ const Home = () => {
             <nav>
               <ul>
               <li>
-                  <Link to={"/Kloop-forms/?url=" + window.location.search}>Home</Link>
+                  <Link to={"/ElectionsMonitoringForms/" + window.location.search}>Home</Link>
               </li>
                 {forms.map((el, i) => (
                   <li key={i}>
-                    <Link to={"/Kloop-forms" + el.path + window.location.search}>{el.label}</Link>
+                    <Link to={"/ElectionsMonitoringForms" + el.path + window.location.search}>{el.label}</Link>
                   </li>
                 ))}
               </ul>
@@ -57,11 +57,11 @@ const Home = () => {
 
             <Switch>
               {forms.map((el, i) => (
-                <Route key={i} path={"/Kloop-forms" + el.path}>
+                <Route key={i} path={"/ElectionsMonitoringForms" + el.path}>
                   {() => <Template url={el.url} path={el.path} />}
                 </Route>
                 ))}
-                <Route exact path="/Kloop-forms/files" component={withRouter(FileUploader)} />
+                <Route exact path="/ElectionsMonitoringForms/files" component={withRouter(FileUploader)} />
             </Switch>
           </div>
         </Router>

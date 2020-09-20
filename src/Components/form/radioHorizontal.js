@@ -14,6 +14,7 @@ export default function RadioHorizontal(props) {
 	const {index, response} = props
 
 	useEffect(() => {
+		console.log(props.question)
 		if (response) {
 			setValue(response)
 		}
@@ -44,7 +45,7 @@ export default function RadioHorizontal(props) {
 			<div className="question_item">
 				{props.subquestion.map((question, id) =>
 					<div className="question_item_" key={id}>
-						<p>{question}</p>
+						<p>{question.q}</p>
 						<FormControl component="fieldset">
 							<RadioGroup aria-label="position" name="position" row value={value[id] ? value[id] : ""}
 							            onClick={handleChange(id)}>

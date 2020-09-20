@@ -35,28 +35,40 @@ class Template extends Component {
 
     downloadData = () => {
         let urlString = queryString.parse(window.location.search, {decode: false})
-        if (this.props.url) {
-            fetch(this.props.url)
-                .then((response) => {
-                    return response.json();
-                })
-                .then((data) => {
-                    this.setState({
-                        questions: data.questions,
-                        main_title: data.main_title,
-                        gateway: data.gateway,
-                        period: data.period
-                    })
-                    if (urlString.response) {
-                      this.initResponse(data, urlString)
-                    }
-                    if (data.period) {
-                      this.timeManager(data)
-                    }
-                });
-        } else {
-            console.log("ERROR: no url detected")
-        }
+        console.log(this.props.data)
+        this.setState({
+          questions: this.props.data.questions,
+          main_title: this.props.data.main_title,
+          period: this.props.data.period
+      })
+      if (urlString.response) {
+        this.initResponse(this.props.data, urlString)
+      }
+      if (this.props.data.period) {
+        this.timeManager(this.props.data)
+      }
+        // if (this.props.url) {
+        //     fetch(this.props.url)
+        //         .then((response) => {
+        //             return response.json();
+        //         })
+        //         .then((data) => {
+        //             this.setState({
+        //                 questions: data.questions,
+        //                 main_title: data.main_title,
+        //                 gateway: data.gateway,
+        //                 period: data.period
+        //             })
+        //             if (urlString.response) {
+        //               this.initResponse(data, urlString)
+        //             }
+        //             if (data.period) {
+        //               this.timeManager(data)
+        //             }
+        //         });
+        // } else {
+        //     console.log("ERROR: no url detected")
+        // }
     }
   
     uploadData = () => {
@@ -171,6 +183,11 @@ class Template extends Component {
       return (
         <div>
           <h1 className="text-align-center">{this.state.main_title}</h1>
+          {this.state.period ? 
+          <div>
+            <p>Start: {this.state.period.start}</p>
+            <p>Finish: {this.state.period.finish}</p>
+          </div> : null}
           {this.state.showFileUpload ? <Redirect to={"/ElectionsMonitoringForms/files"} /> : null}
           <div>
             {questionList}

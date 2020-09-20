@@ -14,7 +14,8 @@ class FileUploader extends Component {
       showAnswers: false,
       period: null,
       locked: false,
-      showFileUpload: false
+      showFileUpload: false,
+      fileInputs: []
     }
 
     static contextType = AuthContext
@@ -41,6 +42,9 @@ class FileUploader extends Component {
                     if (data.period) {
                       this.timeManager(data)
                     }
+                    this.renderFiles()
+                    this.setState({fileInputs: this.fileInputs})
+                    console.log(this.fileInputs)
                 });
         } else {
             console.log("ERROR: no url detected")
@@ -55,7 +59,7 @@ class FileUploader extends Component {
         querySnapshot.forEach(doc => {
           console.log(doc.id, " => ", doc.data());
           if (doc && doc.exists) {
-            this.setState({answers: doc.data()})
+            this.setState({answers: doc.data().answers})
             this.setState({id: doc.id})
             this.downloadData(doc.data().form_url)
           }
@@ -64,7 +68,7 @@ class FileUploader extends Component {
       this.setState({showFileUpload: true})
     }
 
-    uploadFiles = (event, index) => {
+    uploadFiles = (event, index, subindex = null) => {
       const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
 
       const files = event.target.files
@@ -81,7 +85,8 @@ class FileUploader extends Component {
             {
               filepath: url,
               answer_number: index,
-              answer_id: this.state.id
+              answer_id: this.state.id,
+              answer_subnumber: subindex
             }
           ).catch(error => alert(error))
         })
@@ -108,20 +113,46 @@ class FileUploader extends Component {
       }
       console.log("LOCKED ", this.state.locked)
     }
+
+    fileInputs = []
+
+    renderFiles = () => {
+      this.state.questions.forEach((question, i) => {
+        if (question.attachMaterials) {
+          if(question.type === 'multiradio') {
+            if (this.state.answers[i]) {
+              let keys = Object.keys(this.state.answers[i])
+              keys.forEach(key => {
+                console.log(key)
+                if (this.state.answers[i][key] === question.subquestion[key].on) {
+                  this.fileInputs.push({title: question.subquestion[key].q, index: i, subindex: key})
+                }
+              })
+            }
+          }
+          else {
+            this.fileInputs.push({title: question.title, index: i})
+          }
+        }
+      })
+    }
     
   
     render () {
       return (
         <div>
           <h1 className="text-align-center">{this.state.main_title}</h1>
-          {this.state.questions.map((el, index) => {
+          {this.fileInputs.map(el => {
+            let title = el.title
+            let index = el.index.toString()
+            let subindex = el.subindex ? el.subindex.toString() : null
             return (
-              el.attachMaterials ?
-              <div key={index}>
-                <h5>{el.title}</h5>
-                <input disabled={this.state.locked} type="file" name="filefield" multiple="multiple" onChange={(e) => this.uploadFiles(e, index.toString())} />
-              </div> : null
-          )})}
+              <div key={subindex ? index + '.' + subindex : index}>
+                <h5>{title}</h5>
+                <input disabled={this.state.locked} type="file" name="filefield" multiple="multiple" onChange={(e) => this.uploadFiles(e, index, subindex)} />
+              </div>
+            )
+          })}
           {this.state.showAnswers ? <p style={{textAlign: "left"}}>Full answers: {JSON.stringify(this.state.answers)}</p> : null}
           {this.state.showAnswers ? <p style={{textAlign: "left"}}>Short answers: {JSON.stringify(this.state.shortAnswers)}</p> : null}
         </div>

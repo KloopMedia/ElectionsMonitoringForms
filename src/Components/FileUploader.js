@@ -3,6 +3,12 @@ import firebase from '../util/Firebase';
 import "../App.css"
 import { AuthContext } from "../util/Auth";
 
+import Snackbar from '@material-ui/core/Snackbar'
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+import Typography from '@material-ui/core/Typography'
+import { Button, Grid } from '@material-ui/core';
+
 const queryString = require('query-string');
 
 class FileUploader extends Component {
@@ -15,7 +21,9 @@ class FileUploader extends Component {
       period: null,
       locked: false,
       showFileUpload: false,
-      fileInputs: []
+      fileInputs: [],
+      snackbar: false,
+      uploadSuccsess: false
     }
 
     static contextType = AuthContext
@@ -68,31 +76,32 @@ class FileUploader extends Component {
       this.setState({showFileUpload: true})
     }
 
-    uploadFiles = (event, index, subindex = null) => {
-      const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
+    // uploadFiles = (event, index, subindex = null) => {
+    //   const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
 
-      const files = event.target.files
-      Array.from(files).forEach(file => {
-        const fileRef = storageRef.child(file.name)
-        const task = fileRef.put(file)
-        task
-        .then(snapshot => snapshot.ref.getDownloadURL())
-        .then((url) => {
-          let rootRef = firebase.firestore().collection("responses")
-          let userRef = rootRef.doc(this.context.currentUser.uid)
-          let filesRef = userRef.collection("files")
-          filesRef.add(
-            {
-              filepath: url,
-              answer_number: index,
-              answer_id: this.state.id,
-              answer_subnumber: subindex
-            }
-          ).catch(error => alert(error))
-        })
-        .catch(console.error);
-      })
-    }
+    //   const files = event.target.files
+    //   Array.from(files).forEach(file => {
+    //     const fileRef = storageRef.child(file.name)
+    //     const task = fileRef.put(file)
+    //     task
+    //     .then(snapshot => snapshot.ref.getDownloadURL())
+    //     .then((url) => {
+    //       let rootRef = firebase.firestore().collection("responses")
+    //       let userRef = rootRef.doc(this.context.currentUser.uid)
+    //       let filesRef = userRef.collection("files")
+    //       this.setState({snackbar: true})
+    //       filesRef.add(
+    //         {
+    //           filepath: url,
+    //           answer_number: index,
+    //           answer_id: this.state.id,
+    //           answer_subnumber: subindex
+    //         }
+    //       ).catch(error => alert(error))
+    //     })
+    //     .catch(console.error);
+    //   })
+    // }
 
     timeManager = (data) => {
       let now = new Date();
@@ -136,25 +145,118 @@ class FileUploader extends Component {
         }
       })
     }
+
+    handleCloseSnackbar = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      this.setState({snackbar: false})
+    };
+
+    files = {}
+    filesData = {}
+
+    handleFileChange = (event, index, subindex, i) => {
+      this.files[i] = {file: event.target.files, index: index, subindex: subindex}
+    }
+
+    handleURLChange = (event, index, subindex, i) => {
+      this.filesData[i] = {url: event.target.value, index: index, subindex: subindex}
+    }
+
+    uploadFiles = () => {
+      const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
+
+      for (const [key, value] of Object.entries(this.files)) {
+        if (value.file) {
+          Array.from(value.file).forEach(file => {
+            const fileRef = storageRef.child(file.name)
+            const task = fileRef.put(file)
+            task
+            .then(snapshot => snapshot.ref.getDownloadURL())
+            .then((url) => {
+              let rootRef = firebase.firestore().collection("responses")
+              let userRef = rootRef.doc(this.context.currentUser.uid)
+              let filesRef = userRef.collection("files")
+              this.setState({snackbar: true})
+              console.log("Файл отправлен")
+              filesRef.add(
+                {
+                  filepath: url,
+                  answer_number: value.index,
+                  answer_id: this.state.id,
+                  answer_subnumber: value.subindex
+                }
+              ).catch(error => alert(error))
+            })
+            .catch(console.error);
+          })
+        }
+      }
+
+      for (const [key, value] of Object.entries(this.filesData)) {
+        if (value.url) {
+          let rootRef = firebase.firestore().collection("responses")
+          let userRef = rootRef.doc(this.context.currentUser.uid)
+          let filesRef = userRef.collection("files")
+          this.setState({snackbar: true})
+          filesRef.add(
+            {
+              filepath: value.url,
+              answer_number: value.index,
+              answer_id: this.state.id,
+              answer_subnumber: value.subindex
+            }
+          ).catch(error => alert(error))
+        }
+      }
+    }
     
   
     render () {
       return (
         <div>
-          <h1 className="text-align-center">{this.state.main_title}</h1>
-          {this.fileInputs.map(el => {
+          <Typography variant="h4" align="center">{this.state.main_title}</Typography>
+          {this.fileInputs.map((el, i) => {
             let title = el.title
             let index = el.index.toString()
             let subindex = el.subindex ? el.subindex.toString() : null
             return (
-              <div key={subindex ? index + '.' + subindex : index}>
-                <h5>{title}</h5>
-                <input disabled={this.state.locked} type="file" name="filefield" multiple="multiple" onChange={(e) => this.uploadFiles(e, index, subindex)} />
+              <div key={subindex ? index + '.' + subindex : index} style={{padding: 20}}>
+                <Typography variant="body1" style={{fontSize: 16, fontWeight: 'bolder'}}>{title}</Typography>
+                <Grid container display="flex" style={{paddingTop: 10, paddingLeft: 20}}>
+                <Typography variant="body1" style={{paddingRight: 20}}>выберите файлы</Typography>
+                <input disabled={this.state.locked} type="file" name="filefield" multiple="multiple" onChange={(e) => this.handleFileChange(e, index, subindex, i)} />
+                </Grid>
+                <Grid container style={{paddingTop: 10, paddingLeft: 20}}>
+                <Typography variant="body1" style={{paddingRight: 20}}>или введите URL</Typography>
+                <input type="text" size="40" onChange={(e) => this.handleURLChange(e, index, subindex, i)}/>
+                </Grid>
               </div>
             )
           })}
-          {this.state.showAnswers ? <p style={{textAlign: "left"}}>Full answers: {JSON.stringify(this.state.answers)}</p> : null}
-          {this.state.showAnswers ? <p style={{textAlign: "left"}}>Short answers: {JSON.stringify(this.state.shortAnswers)}</p> : null}
+
+          <Grid container justify="center" style={{paddingTop: 20, paddingBottom: 20}}>
+            <Button variant="contained" onClick={this.uploadFiles}>Отправить</Button>
+          </Grid>
+
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={this.state.snackbar}
+            autoHideDuration={5000}
+            onClose={this.handleCloseSnackbar}
+            message="Ваши файлы успешно отправлены"
+            action={
+              <React.Fragment>
+                <IconButton size="small" aria-label="close" color="inherit" onClick={this.handleCloseSnackbar}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </React.Fragment>
+            }
+          />
         </div>
       );
     }

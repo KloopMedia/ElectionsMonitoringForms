@@ -11,6 +11,7 @@ import Template from './../Template'
 import FileUploader from './../FileUploader'
 import { AuthContext } from "../../util/Auth.js";
 
+
 const queryString = require('query-string');
 
 
@@ -63,15 +64,14 @@ const Home = () => {
   return (
     <>
       {formData ? <div>
-      <button onClick={() => app.auth().signOut()}>Sign out</button>
-      <p>{currentUser.email}</p>
       <Router>
           <div>
             <nav>
               <ul>
               <li>
-                <Link to={"/ElectionsMonitoringForms/" + window.location.search}>Home</Link>
+                <Link to={"/ElectionsMonitoringForms/" + window.location.search}>На главную</Link>
               </li>
+              <br />
                 {forms.map((el, i) => {
                   return timeManager(formData[i]) ? null : <div>
                     <li key={i}>
@@ -79,6 +79,10 @@ const Home = () => {
                     </li>
                   </div>
                 })}
+                <br/>
+                <li>
+                <Link to={"/ElectionsMonitoringForms/files" + window.location.search}>Форма для отправки файлов</Link>
+              </li>
               </ul>
             </nav>
 

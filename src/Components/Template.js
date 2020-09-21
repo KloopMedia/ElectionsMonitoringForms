@@ -10,6 +10,10 @@ import TimePickers from "./form/timePickers";
 import RadioHorizontal from "./form/radioHorizontal";
 import { Link, BrowserRouter as Router, withRouter, Redirect } from 'react-router-dom';
 
+import Snackbar from '@material-ui/core/Snackbar'
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
+
 const queryString = require('query-string');
 
 class Template extends Component {
@@ -24,7 +28,9 @@ class Template extends Component {
       period: null,
       locked: false,
       files: [],
-      showFileUpload: false
+      showFileUpload: false,
+      snackbar: false,
+      uploadSuccsess: false
     }
 
     static contextType = AuthContext
@@ -61,10 +67,14 @@ class Template extends Component {
             form_url: this.props.url,
             date: new Date()
           }
-        ).catch(error => alert(error))
-        
+        ).then(doc => {
+          this.setState({snackbar: true, uploadSuccsess: true})
+        })
+        .catch(error => {
+          this.setState({showAnswers: true})
+          console.log(error)
+        })
         console.log("data uploaded")
-        this.setState({showAnswers: true})
         this.setState({showFileUpload: true})
       }
       catch (err) {
@@ -132,6 +142,13 @@ class Template extends Component {
       shortAnswers[index] = id
       this.setState({shortAnswers: shortAnswers})
     }
+
+    handleCloseSnackbar = (event, reason) => {
+      if (reason === 'clickaway') {
+        return;
+      }
+      this.setState({snackbar: false})
+    };
     
   
     render () {
@@ -163,18 +180,34 @@ class Template extends Component {
           <h1 className="text-align-center">{this.state.main_title}</h1>
           {this.state.period ? 
           <div>
-            <p>Start: {this.state.period.start}</p>
-            <p>Finish: {this.state.period.finish}</p>
+            <p>Начало: {this.state.period.start}</p>
+            <p>Конец: {this.state.period.finish}</p>
           </div> : null}
-          {this.state.showFileUpload ? <Redirect to={"/ElectionsMonitoringForms/files"} /> : null}
+          {/* {this.state.showFileUpload ? <Redirect to={"/ElectionsMonitoringForms/files"} /> : null} */}
           <div>
             {questionList}
             <div style={{paddingTop: 20, paddingBottom: 20, textAlign: "center"}}>
-              <button disabled={this.state.locked ? true : false} onClick={this.uploadData}>Send data</button>
+              <button disabled={this.state.locked ? true : false} onClick={this.uploadData}>Отправить</button>
             </div>
           </div>
-          {this.state.showAnswers ? <p style={{textAlign: "left"}}>Full answers: {JSON.stringify(this.state.answers)}</p> : null}
-          {this.state.showAnswers ? <p style={{textAlign: "left"}}>Short answers: {JSON.stringify(this.state.shortAnswers)}</p> : null}
+          {this.state.showAnswers ? <p style={{textAlign: "left"}}>Короткий ответ: {JSON.stringify(this.state.shortAnswers)}</p> : null}
+          <Snackbar
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            open={this.state.snackbar}
+            autoHideDuration={6000}
+            onClose={this.handleCloseSnackbar}
+            message="Ваш ответ принят"
+            action={
+              <React.Fragment>
+                <IconButton size="small" aria-label="close" color="inherit" onClick={this.handleCloseSnackbar}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </React.Fragment>
+            }
+          />
         </div>
       );
     }

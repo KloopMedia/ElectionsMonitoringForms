@@ -47,28 +47,6 @@ class Template extends Component {
       if (this.props.data.period) {
         this.timeManager(this.props.data)
       }
-        // if (this.props.url) {
-        //     fetch(this.props.url)
-        //         .then((response) => {
-        //             return response.json();
-        //         })
-        //         .then((data) => {
-        //             this.setState({
-        //                 questions: data.questions,
-        //                 main_title: data.main_title,
-        //                 gateway: data.gateway,
-        //                 period: data.period
-        //             })
-        //             if (urlString.response) {
-        //               this.initResponse(data, urlString)
-        //             }
-        //             if (data.period) {
-        //               this.timeManager(data)
-        //             }
-        //         });
-        // } else {
-        //     console.log("ERROR: no url detected")
-        // }
     }
   
     uploadData = () => {

@@ -16,12 +16,32 @@ import { AuthProvider } from "./util/Auth";
 import PrivateRoute from "./util/PrivateRoute";
 import FileUploader from './Components/FileUploader'
 
+import { withStyles } from '@material-ui/core/styles';
+import Grid from '@material-ui/core/Grid'
+
+const styles = theme => ({
+  app: {
+      padding: '10px',
+      [theme.breakpoints.down('sm')]: {
+          width: '100%',
+        },
+      [theme.breakpoints.up('sm')]: {
+      width: '70%',
+      },
+      [theme.breakpoints.up('md')]: {
+      width: '50%',
+      },
+  }
+});
 
 class App extends Component {
 
   render () {
+    const { classes } = this.props;
     return (
-      <div className="App">
+      
+      <Grid container justify="center">
+      <div className={classes.app}>
       <AuthProvider>
          <Router>
           <div>
@@ -38,10 +58,11 @@ class App extends Component {
           </div>
         </Router>
         </AuthProvider>
-      </div>
+        </div>
+        </Grid>
     );
   }
 }
 
 
-export default App;
+export default withStyles(styles, { withTheme: true })(App);

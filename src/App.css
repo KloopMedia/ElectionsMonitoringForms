@@ -1,14 +1,14 @@
-.App {
+/* .App {
     width: 50%;
     margin: 0 auto;
 }
 
 .text-align-center{
     text-align: center;
-}
+} */
 
 /*radioHorizontal*/
-.question_item_ {
+/* .question_item_ {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: 1fr;
@@ -28,4 +28,4 @@
     grid-template-rows: 1fr;
 
     justify-items: center;
-}
+} */

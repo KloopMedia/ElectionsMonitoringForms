@@ -8,6 +8,8 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import Typography from '@material-ui/core/Typography'
 import { Button, Grid } from '@material-ui/core';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import Box from '@material-ui/core/Box'
 
 const queryString = require('query-string');
 
@@ -155,6 +157,7 @@ class FileUploader extends Component {
 
     files = {}
     filesData = {}
+    progress = 0
 
     handleFileChange = (event, index, subindex, i) => {
       this.files[i] = {file: event.target.files, index: index, subindex: subindex}
@@ -166,8 +169,9 @@ class FileUploader extends Component {
 
     uploadFiles = () => {
       const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
-
-      for (const [key, value] of Object.entries(this.files)) {
+      this.progress = 0
+      let allFiles = Object.values(this.files).concat(Object.values(this.filesData))
+      allFiles.forEach((value, i) => {
         if (value.file) {
           Array.from(value.file).forEach(file => {
             const fileRef = storageRef.child(file.name)
@@ -187,14 +191,12 @@ class FileUploader extends Component {
                   answer_id: this.state.id,
                   answer_subnumber: value.subindex
                 }
-              ).catch(error => alert(error))
+              ).then(() => this.progress = (i + 1) / allFiles.length * 100).catch(error => alert(error))
             })
             .catch(console.error);
           })
         }
-      }
-
-      for (const [key, value] of Object.entries(this.filesData)) {
+      
         if (value.url) {
           let rootRef = firebase.firestore().collection("responses")
           let userRef = rootRef.doc(this.context.currentUser.uid)
@@ -207,9 +209,25 @@ class FileUploader extends Component {
               answer_id: this.state.id,
               answer_subnumber: value.subindex
             }
-          ).catch(error => alert(error))
+          ).then(() => this.progress = (i + 1) / allFiles.length * 100).catch(error => alert(error))
         }
       }
+      )
+    }
+
+    LinearProgressWithLabel = (props) => {
+      return (
+        <Box display="flex" alignItems="center">
+          <Box width="100%" mr={1}>
+            <LinearProgress variant="determinate" {...props} />
+          </Box>
+          <Box minWidth={35}>
+            <Typography variant="body2" color="textSecondary">{`${Math.round(
+              props.value,
+            )}%`}</Typography>
+          </Box>
+        </Box>
+      );
     }
     
   
@@ -239,6 +257,7 @@ class FileUploader extends Component {
           <Grid container justify="center" style={{paddingTop: 20, paddingBottom: 20}}>
             <Button variant="contained" onClick={this.uploadFiles}>Отправить</Button>
           </Grid>
+          <this.LinearProgressWithLabel value={this.progress} />
 
           <Snackbar
             anchorOrigin={{

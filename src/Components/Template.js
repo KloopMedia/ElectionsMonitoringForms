@@ -13,6 +13,8 @@ import { Link, BrowserRouter as Router, withRouter, Redirect } from 'react-route
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
+import { Button } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography'
 
 const queryString = require('query-string');
 
@@ -59,6 +61,7 @@ class Template extends Component {
       try {
         let rootRef = firebase.firestore().collection("responses")
         let userRef = rootRef.doc(this.context.currentUser.uid)
+        userRef.set({email: this.context.currentUser.email})
         let answersRef = userRef.collection("answers")
         answersRef.add(
           {
@@ -75,7 +78,6 @@ class Template extends Component {
           console.log(error)
         })
         console.log("data uploaded")
-        this.setState({showFileUpload: true})
       }
       catch (err) {
         alert(err)
@@ -149,6 +151,10 @@ class Template extends Component {
       }
       this.setState({snackbar: false})
     };
+
+    handleRedirect = () => {
+      return <Redirect to={"/ElectionsMonitoringForms/files"} />
+    }
     
   
     render () {
@@ -177,17 +183,19 @@ class Template extends Component {
   
       return (
         <div>
-          <h1 className="text-align-center">{this.state.main_title}</h1>
+          <Typography variant="h4" style={{padding: 20}} align="center">{this.state.main_title}</Typography>
           {this.state.period ? 
           <div>
             <p>Начало: {this.state.period.start}</p>
             <p>Конец: {this.state.period.finish}</p>
           </div> : null}
           {/* {this.state.showFileUpload ? <Redirect to={"/ElectionsMonitoringForms/files"} /> : null} */}
+          {this.state.showFileUpload ? <this.handleRedirect /> : null}
           <div>
             {questionList}
             <div style={{paddingTop: 20, paddingBottom: 20, textAlign: "center"}}>
-              <button disabled={this.state.locked ? true : false} onClick={this.uploadData}>Отправить</button>
+              <Button variant="outlined" style={{borderWidth: 2, borderColor: "#003366", color: '#003366', margin: 10}} disabled={this.state.locked ? true : false} onClick={this.uploadData}>Отправить</Button>
+              {this.state.uploadSuccsess ? <Button variant="outlined" style={{borderWidth: 2, borderColor: "red", color: 'red', margin: 10}} disabled={this.state.locked ? true : false} onClick={() => this.setState({showFileUpload: true})}>Перейти к загрузке файлов</Button> : null }
             </div>
           </div>
           {this.state.showAnswers ? <p style={{textAlign: "left"}}>Короткий ответ: {JSON.stringify(this.state.shortAnswers)}</p> : null}

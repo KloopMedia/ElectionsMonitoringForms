@@ -170,6 +170,12 @@ class FileUploader extends Component {
     uploadFiles = () => {
       const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
       this.progress = 0
+      let filesCount = 0
+      Object.values(this.files).forEach(f => {
+        Array.from(f.file).forEach(sf => filesCount += 1)
+      })
+      Object.values(this.filesData).forEach(f => filesCount += 1)
+      console.log("COUNT", filesCount)
       let allFiles = Object.values(this.files).concat(Object.values(this.filesData))
       allFiles.forEach((value, i) => {
         if (value.file) {
@@ -191,7 +197,7 @@ class FileUploader extends Component {
                   answer_id: this.state.id,
                   answer_subnumber: value.subindex
                 }
-              ).then(() => this.progress = (i + 1) / allFiles.length * 100).catch(error => alert(error))
+              ).then(() => this.progress += 1/filesCount * 100).catch(error => alert(error))
             })
             .catch(console.error);
           })
@@ -209,7 +215,7 @@ class FileUploader extends Component {
               answer_id: this.state.id,
               answer_subnumber: value.subindex
             }
-          ).then(() => this.progress = (i + 1) / allFiles.length * 100).catch(error => alert(error))
+          ).then(() => this.progress += 1/filesCount * 100).catch(error => alert(error))
         }
       }
       )

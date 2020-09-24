@@ -5,6 +5,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Link,
   withRouter, Redirect 
 } from "react-router-dom";
 
@@ -22,7 +23,7 @@ import Typography from '@material-ui/core/Typography';
 
 import { AuthContext } from "./util/Auth";
 import firebase from './util/Firebase';
-import { Button, Link } from '@material-ui/core';
+import { Button} from '@material-ui/core';
 
 const styles = theme => ({
   app: {
@@ -62,10 +63,6 @@ const styles = theme => ({
 class App extends Component {
   static contextType = AuthContext
 
-  handleTitleClick = () => {
-    return <Redirect to="/ElectionsMonitoringForms/" />
-  }
-
   render () {
     const { classes } = this.props;
     let email = ""
@@ -96,7 +93,7 @@ class App extends Component {
           <div>
             {/* <nav>
               <li>
-                  <Link to={"/?url" + window.location.search}>Home</Link>
+                  <Link to={"/ElectionsMonitoringForms/" + window.location.search}>Home</Link>
               </li>
             </nav> */}
 

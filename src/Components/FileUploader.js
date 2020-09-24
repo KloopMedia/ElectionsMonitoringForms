@@ -78,33 +78,6 @@ class FileUploader extends Component {
       this.setState({showFileUpload: true})
     }
 
-    // uploadFiles = (event, index, subindex = null) => {
-    //   const storageRef = firebase.storage().ref().child(this.context.currentUser.uid);
-
-    //   const files = event.target.files
-    //   Array.from(files).forEach(file => {
-    //     const fileRef = storageRef.child(file.name)
-    //     const task = fileRef.put(file)
-    //     task
-    //     .then(snapshot => snapshot.ref.getDownloadURL())
-    //     .then((url) => {
-    //       let rootRef = firebase.firestore().collection("responses")
-    //       let userRef = rootRef.doc(this.context.currentUser.uid)
-    //       let filesRef = userRef.collection("files")
-    //       this.setState({snackbar: true})
-    //       filesRef.add(
-    //         {
-    //           filepath: url,
-    //           answer_number: index,
-    //           answer_id: this.state.id,
-    //           answer_subnumber: subindex
-    //         }
-    //       ).catch(error => alert(error))
-    //     })
-    //     .catch(console.error);
-    //   })
-    // }
-
     timeManager = (data) => {
       let now = new Date();
       let start = new Date(data.period.start);
@@ -195,7 +168,9 @@ class FileUploader extends Component {
                   filepath: url,
                   answer_number: value.index,
                   answer_id: this.state.id,
-                  answer_subnumber: value.subindex
+                  answer_subnumber: value.subindex,
+                  form_name: this.state.main_title,
+                  date: new Date()
                 }
               ).then(() => this.progress += 1/filesCount * 100).catch(error => alert(error))
             })

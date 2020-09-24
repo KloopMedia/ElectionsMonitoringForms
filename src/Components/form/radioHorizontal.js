@@ -28,7 +28,6 @@ export default function RadioHorizontal(props) {
 	const {index, response} = props
 
 	useEffect(() => {
-		console.log(props.question)
 		if (response) {
 			setValue(response)
 		}

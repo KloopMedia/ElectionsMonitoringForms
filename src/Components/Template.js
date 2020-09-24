@@ -1,4 +1,4 @@
-import React, {Component, useContext} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import firebase from '../util/Firebase';
 import "../App.css"
 import { AuthContext } from "../util/Auth";
@@ -8,7 +8,7 @@ import SelectBox from "./form/selectBox";
 import RadioButton from "./form/radiobutton";
 import TimePickers from "./form/timePickers";
 import RadioHorizontal from "./form/radioHorizontal";
-import { Link, BrowserRouter as Router, withRouter, Redirect } from 'react-router-dom';
+import { withRouter, useParams, Redirect } from 'react-router-dom';
 
 import Snackbar from '@material-ui/core/Snackbar'
 import IconButton from '@material-ui/core/IconButton';
@@ -18,207 +18,232 @@ import Typography from '@material-ui/core/Typography'
 
 const queryString = require('query-string');
 
-class Template extends Component {
-    state = {
-      questions: [],
-      main_title: '',
-      gateway: '',
-      answers: {},
-      shortAnswers: {},
-      showAnswers: false,
-      response: {},
-      period: null,
-      locked: false,
-      files: [],
-      showFileUpload: false,
-      snackbar: false,
-      uploadSuccsess: false
-    }
+const Template = (props) => {
 
-    static contextType = AuthContext
-  
-    componentDidMount() {
-        this.downloadData()
-    }
+    const [data, setData] = useState([])
+    const [fullAnswers, setFull] = useState({})
+    const [shortAnswers, setShort] = useState({})
+    const [response, setResponse] = useState({})
+    const [locked, setLocked] = useState(false)
+    const [snackbar, setSnackbar] = useState(false)
+    const [showFileUpload, setFileUpload] = useState(false)
+    const [uploadSuccsess, setSuccess] = useState(false)
+    const [showAnswers, setShowAnswers] = useState(false)
+    const [ready, setReady] = useState(false)
+    const [formData, setForm] = useState(null)
+    const [message, setMessage] = useState(null)
 
-    downloadData = () => {
-        let urlString = queryString.parse(window.location.search, {decode: false})
-        console.log(this.props.data)
-        this.setState({
-          questions: this.props.data.questions,
-          main_title: this.props.data.main_title,
-          period: this.props.data.period
-      })
-      if (urlString.response) {
-        this.initResponse(this.props.data, urlString)
-      }
-      if (this.props.data.period) {
-        this.timeManager(this.props.data)
-      }
-    }
+    const { currentUser } = useContext(AuthContext);
+    let { form } = useParams();
   
-    uploadData = () => {
+    useEffect(() => {
+      let urlString = queryString.parse(window.location.search)
+      console.log(urlString)
+      if (urlString.url) {
+        fetch(urlString.url)
+          .then((response) => {
+            console.log("RESPONSE", response)
+            return response.json();
+          })
+          .then((data) => {
+            console.log("DATA", data);
+            data.forEach(d => {
+              if (d.path === '/' + form) {
+                setForm(d)
+                fetch(d.url).then(r => r.json()).then(f => {
+                  setData(f)
+                  setReady(true)
+                  if (urlString.response) {
+                    initResponse(f, urlString)
+                  }
+                  if (f.period) {
+                    timeManager(f)
+                  }
+                  console.log(f)
+                })
+              }
+            })
+          });
+      } else {
+        console.log("ERROR: no url detected")
+      }
+    },[])
+  
+    const uploadData = async () => {
       try {
+        let short = shortAnswers
+        let name = data.main_title
+        setMessage({answers: short, form_name: name})
+
+        let urlString = queryString.parse(window.location.search)
+        const response = await fetch(urlString.url);
+        if (!response.ok) {
+          setShowAnswers(true)
+          throw new Error('Ответ сети был не ok.');
+        }
+
         let rootRef = firebase.firestore().collection("responses")
-        let userRef = rootRef.doc(this.context.currentUser.uid)
-        userRef.set({email: this.context.currentUser.email})
+        let userRef = rootRef.doc(currentUser.uid)
+        userRef.set({email: currentUser.email})
         let answersRef = userRef.collection("answers")
+        console.log(formData)
+        console.log(fullAnswers)
+        console.log(data.main_title)
         answersRef.add(
           {
-            answers: this.state.answers,
-            form_name: this.state.main_title,
-            form_url: this.props.url,
+            answers: fullAnswers,
+            form_name: data.main_title,
+            form_url: formData.url,
             date: new Date()
           }
         ).then(doc => {
-          this.setState({snackbar: true, uploadSuccsess: true})
+          setSnackbar(true)
+          setSuccess(true)
         })
         .catch(error => {
-          this.setState({showAnswers: true})
+          setShowAnswers(true)
           console.log(error)
         })
         console.log("data uploaded")
+        setShowAnswers(true)
       }
       catch (err) {
         alert(err)
-        this.setState({showAnswers: true})
+        setShowAnswers(true)
       }
     }
 
-    timeManager = (data) => {
+    const timeManager = (data) => {
       let now = new Date();
       let start = new Date(data.period.start);
       let finish = new Date(data.period.finish)
 
       if (start > now && data.period.before.nofill) {
-        this.setState({locked: true})
+        setLocked(true)
       }
       else if (start < now && now < finish && data.period.in.nofill) {
-        this.setState({locked: true})
+        setLocked(true)
       }
       else if (now > finish && data.period.after.nofill) {
-        this.setState({locked: true})
+        setLocked(true)
       }
       else {
-        this.setState({locked: false})
+        setLocked(false)
       }
-      console.log("LOCKED ", this.state.locked)
+      console.log("LOCKED ", locked)
     }
 
-    initResponse = (data, urlString) => {
+    const initResponse = (data, urlString) => {
       let decodedResponse = decodeURI(urlString.response)
       let response = JSON.parse(decodedResponse)
-      this.setState({response: response})
+      setResponse(response)
       for (const [key, value] of Object.entries(response)) {
         let id = null
         if (key === Object.keys(response)[0]) {
-          this.returnAnswer(value, key)
+          returnAnswer(value, key)
         }
         if (data.questions[key].type === 'input') {
-          this.returnAnswer(value, key)
+          returnAnswer(value, key)
         }
         else if (data.questions[key].type === 'time') {
-          this.returnAnswer(value, key, value)
+          returnAnswer(value, key, value)
         }
         else if (data.questions[key].type === 'multiradio') {
           for (const [nestedKey, nestedValue] of Object.entries(value)) {
             let id = data.questions[key].answer.indexOf(nestedValue)
-            let idArr = {...this.state.shortAnswers[key]}
+            let idArr = {...shortAnswers[key]}
             idArr[nestedKey] = id
-            this.returnAnswer(value, key, idArr)
+            returnAnswer(value, key, idArr)
           }
         }
         else {
           id = data.questions[key].answer.indexOf(value)
-          this.returnAnswer(value, key, id)
+          returnAnswer(value, key, id)
         }
       }
     }
   
-    returnAnswer = (answer, index, id = null) => {
-      let answers = {...this.state.answers}
+    const returnAnswer = (answer, index, id = null) => {
+      let answers = {...fullAnswers}
       answers[index] = answer
-      this.setState({answers: answers})
+      setFull(answers)
 
-      let shortAnswers = {...this.state.shortAnswers}
-      shortAnswers[index] = id
-      this.setState({shortAnswers: shortAnswers})
+      let short = {...shortAnswers}
+      short[index] = id
+      setShort(short)
     }
 
-    handleCloseSnackbar = (event, reason) => {
+    const handleCloseSnackbar = (event, reason) => {
       if (reason === 'clickaway') {
         return;
       }
-      this.setState({snackbar: false})
+      setSnackbar(false)
     };
 
-    handleRedirect = () => {
+    const HandleRedirect = () => {
       return <Redirect to={"/ElectionsMonitoringForms/files"} />
     }
     
-  
-    render () {
-      let questionList = this.state.questions.map((el, i) => {
-        const r = this.state.response
+    let questionList = ready ? data.questions.map((el, i) => {
+      const r = response
 
-        if (el.type === 'input') {
-          return <TextInput key={i} index={i} title={el.title} response={r[i]} returnAnswer={this.returnAnswer} locked={this.state.locked} />
-        }
-        else if (el.type === 'select') {
-          return <SelectBox key={i} index={i} title={el.title} response={r[i]} answers={el.answer} returnAnswer={this.returnAnswer} locked={this.state.locked} />
-        }
-        else if (el.type === 'radio') {
-          return <RadioButton key={i} index={i} title={el.title} response={r[i]} answers={el.answer} returnAnswer={this.returnAnswer} locked={this.state.locked} />
-        }
-        else if (el.type === 'time') {
-          return <TimePickers key={i} index={i} title={el.title} response={r[i]} returnAnswer={this.returnAnswer} locked={this.state.locked} />
-        }
-        else if (el.type === 'multiradio') {
-          return <RadioHorizontal key={i} index={i} title={el.title} response={r[i]} subquestion={el.subquestion} answers={el.answer} returnAnswer={this.returnAnswer} locked={this.state.locked} />
-        }
-        else {
-          return null
-        }
-      })
+      if (el.type === 'input') {
+        return <TextInput key={i} index={i} title={el.title} response={r[i]} returnAnswer={returnAnswer} locked={locked} />
+      }
+      else if (el.type === 'select') {
+        return <SelectBox key={i} index={i} title={el.title} response={r[i]} answers={el.answer} returnAnswer={returnAnswer} locked={locked} />
+      }
+      else if (el.type === 'radio') {
+        return <RadioButton key={i} index={i} title={el.title} response={r[i]} answers={el.answer} returnAnswer={returnAnswer} locked={locked} />
+      }
+      else if (el.type === 'time') {
+        return <TimePickers key={i} index={i} title={el.title} response={r[i]} returnAnswer={returnAnswer} locked={locked} />
+      }
+      else if (el.type === 'multiradio') {
+        return <RadioHorizontal key={i} index={i} title={el.title} response={r[i]} subquestion={el.subquestion} answers={el.answer} returnAnswer={returnAnswer} locked={locked} />
+      }
+      else {
+        return null
+      }
+    }) : null
   
-      return (
+    return (
+      <div>
+        <Typography variant="h4" style={{padding: 20}} align="center">{data.main_title}</Typography>
+        {data.period ? 
         <div>
-          <Typography variant="h4" style={{padding: 20}} align="center">{this.state.main_title}</Typography>
-          {this.state.period ? 
-          <div>
-            <p>Начало: {this.state.period.start}</p>
-            <p>Конец: {this.state.period.finish}</p>
-          </div> : null}
-          {/* {this.state.showFileUpload ? <Redirect to={"/ElectionsMonitoringForms/files"} /> : null} */}
-          {this.state.showFileUpload ? <this.handleRedirect /> : null}
-          <div>
-            {questionList}
-            <div style={{paddingTop: 20, paddingBottom: 20, textAlign: "center"}}>
-              <Button variant="outlined" style={{borderWidth: 2, borderColor: "#003366", color: '#003366', margin: 10}} disabled={this.state.locked ? true : false} onClick={this.uploadData}>Отправить</Button>
-              {this.state.uploadSuccsess ? <Button variant="outlined" style={{borderWidth: 2, borderColor: "red", color: 'red', margin: 10}} disabled={this.state.locked ? true : false} onClick={() => this.setState({showFileUpload: true})}>Перейти к загрузке файлов</Button> : null }
-            </div>
+          <p>Начало: {data.period.start}</p>
+          <p>Конец: {data.period.finish}</p>
+        </div> : null}
+        {showFileUpload ? <Redirect to={"/ElectionsMonitoringForms/files" + window.location.search} /> : null}
+        {/* {showFileUpload ? <HandleRedirect /> : null} */}
+        <div>
+          {questionList}
+          <div style={{paddingTop: 20, paddingBottom: 20, textAlign: "center"}}>
+            <Button variant="outlined" style={{borderWidth: 2, borderColor: "#003366", color: '#003366', margin: 10}} disabled={locked ? true : false} onClick={uploadData}>Отправить</Button>
+            {uploadSuccsess ? <Button variant="outlined" style={{borderWidth: 2, borderColor: "red", color: 'red', margin: 10}} disabled={locked ? true : false} onClick={() => setFileUpload(true)}>Перейти к загрузке файлов</Button> : null }
           </div>
-          {this.state.showAnswers ? <p style={{textAlign: "left"}}>Короткий ответ: {JSON.stringify(this.state.shortAnswers)}</p> : null}
-          <Snackbar
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            open={this.state.snackbar}
-            autoHideDuration={6000}
-            onClose={this.handleCloseSnackbar}
-            message="Ваш ответ принят"
-            action={
-              <React.Fragment>
-                <IconButton size="small" aria-label="close" color="inherit" onClick={this.handleCloseSnackbar}>
-                  <CloseIcon fontSize="small" />
-                </IconButton>
-              </React.Fragment>
-            }
-          />
         </div>
-      );
-    }
+        {showAnswers ? <p style={{textAlign: "left"}}>Короткий ответ: {JSON.stringify(message)}</p> : null}
+        <Snackbar
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'left',
+          }}
+          open={snackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          message="Ваш ответ принят"
+          action={
+            <React.Fragment>
+              <IconButton size="small" aria-label="close" color="inherit" onClick={handleCloseSnackbar}>
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </React.Fragment>
+          }
+        />
+      </div>
+    );
   }
 
   export default withRouter(Template)

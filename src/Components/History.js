@@ -1,50 +1,39 @@
 import React, { useEffect, useState, useContext } from "react";
 import firebase from "../util/Firebase.js";
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  withRouter
+  Link
 } from "react-router-dom";
-import Template from './Template'
 import { AuthContext } from "../util/Auth";
-import { Grid, Typography, Button } from "@material-ui/core";
-
-
-const queryString = require('query-string');
+import { Grid, Typography } from "@material-ui/core";
 
 
 const History = () => {
-  const [forms, setForms] = useState([])
-  const [numbers, setNumbers] = useState({})
   const [formData, setData] = useState(null)
-  const { currentUser } = useContext(AuthContext);
+	const { currentUser } = useContext(AuthContext);
   
   useEffect(() => {
     let rootRef = firebase.firestore().collection('responses')
 		let userRef = rootRef.doc(currentUser.uid)
+		console.log(currentUser.uid)
 		let answersRef = userRef.collection("answers")
 		answersRef.orderBy("date", "desc").get().then(querySnapshot => {
 			let data = []
-			console.log(querySnapshot)
 			querySnapshot.forEach(doc => {
-				console.log(doc.id)
 				if (doc && doc.exists) {
-					data.push(doc.data())
+					data.push({id: doc.id, data: doc.data()})
 				}
 			});
 			setData(data)
 		})
-  },[])
-
-
+	},[currentUser])
+	
+	console.log(formData)
 
   return (
     <>
 		<Typography variant="h4" align="center">История</Typography>
       {formData ? formData.map(form => {
-				let d = new Date({...form.date}.seconds * 1000)
+				let d = new Date({...form.data.date}.seconds * 1000)
 				let date = [
 							d.getDate().toString().length < 2 ? '0' + d.getDate() : d.getDate(),
 							(d.getMonth()+1).toString().length < 2 ? '0' + (d.getMonth()+1) : (d.getMonth()+1),
@@ -53,15 +42,12 @@ const History = () => {
                d.getMinutes().toString().length < 2 ? '0' + d.getMinutes() : d.getMinutes(),
                d.getSeconds().toString().length < 2 ? '0' + d.getSeconds() : d.getSeconds()].join(':').toString();
 			return (
-				<Grid container component="link" style={{margin: 20}}>
-				<Button variant="outlined" fullWidth>
-					<Typography style={{flexGrow: 1, paddingRight: 20}}>{form.form_name}</Typography>
-					<Typography>{date}</Typography>
-				</Button>
+				<Grid container alignItems="center">
+					<Link to={"/ElectionsMonitoringForms/files/" + form.id + window.location.search} style={{flexGrow: 1, paddingRight: 20}}>{form.data.form_name}</Link>
+					<p>{date}</p>
 				</Grid>
 			)}) : 
 			<Typography variant="h6" align="center" style={{marginTop: 20}}>Пусто</Typography>}
-
     </>
   );
 };

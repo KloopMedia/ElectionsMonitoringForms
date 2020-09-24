@@ -13,12 +13,26 @@ export const AuthProvider = ({ children }) => {
       setPending(false)
       let rootRef = firebase.firestore().collection("users")
       let userRef = rootRef.doc(user.uid)
-      userRef.set(
-        {
-          name: user.displayName,
-          role: 'independent'
+      userRef.get().then(doc => {
+        if (doc && doc.exists) {
+          if (doc.data().role) {
+            userRef.set(
+              {
+                name: user.displayName,
+                role: doc.data().role
+              }
+            )
+          }
         }
-      )
+        else {
+          userRef.set(
+            {
+              name: user.displayName,
+              role: 'independent'
+            }
+          )
+        }
+      })
     });
   }, []);
 

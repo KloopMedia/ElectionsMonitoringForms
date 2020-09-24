@@ -5,25 +5,32 @@ import {
   Switch,
   Route,
   Link,
-  withRouter
+  withRouter,
+  useRouteMatch
 } from "react-router-dom";
 import Template from './../Template'
 import FileUploader from './../FileUploader'
 import History from './../History'
 import { AuthContext } from "../../util/Auth.js";
-import { Grid } from "@material-ui/core";
+import { Grid, Typography } from "@material-ui/core";
 
 
 const queryString = require('query-string');
 
 
-const Home = () => {
+const Home = (props) => {
   const [forms, setForms] = useState([])
   const [numbers, setNumbers] = useState({})
   const [formData, setData] = useState(null)
+  const [role, setRole] = useState(null)
+
   const { currentUser } = useContext(AuthContext);
+  let { path, url } = useRouteMatch();
   
   useEffect(() => {
+    let rootRef = firebase.firestore().collection('users')
+    let userRef = rootRef.doc(currentUser.uid)
+    userRef.get().then(doc => setRole(doc.data().role))
     let urlString = queryString.parse(window.location.search)
     console.log(urlString)
 		if (urlString.url) {
@@ -86,47 +93,33 @@ const Home = () => {
     }
   }
 
+  
+
   return (
     <>
-      {formData ? <div>
-      <Router>
-          <div>
-            <nav>
-              <ul>
-              <li>
-                <Link to={"/ElectionsMonitoringForms/" + window.location.search}>На главную</Link>
-              </li>
-              <br />
-                {forms.map((el, i) => {
-                  return timeManager(formData[i]) ? null : <Grid key={i} container>
-                    <li>
-                      <Link to={"/ElectionsMonitoringForms" + el.path + window.location.search}>{el.label}</Link>
-                      <p>Отправлено {numbers[formData[i].main_title]} {numbers[formData[i].main_title] < 5 && numbers[formData[i].main_title] > 0 ? 'файла' : 'файлов'}</p>
-                    </li>
-                  </Grid>
-                })}
-                <br/>
-                <li>
-                  <Link to={"/ElectionsMonitoringForms/files" + window.location.search}>Форма для отправки файлов</Link>
-                </li>
-                <li>
-                  <Link to={"/ElectionsMonitoringForms/history" + window.location.search}>История</Link>
-                </li>
-              </ul>
-            </nav>
-
-            <Switch>
-              {forms.map((el, i) => (
-                <Route key={i} path={"/ElectionsMonitoringForms" + el.path}>
-                  {() => <Template url={el.url} path={el.path} data={formData[i]} />}
-                </Route>
-                ))}
-                <Route exact path="/ElectionsMonitoringForms/files/:id" component={withRouter(FileUploader)} />
-                <Route exact path="/ElectionsMonitoringForms/history" component={withRouter(History)} />
-            </Switch>
-          </div>
-        </Router>
-        </div> : null}
+    <br />
+     {formData && role ? <div>
+      {forms.map((el, i) => {
+        console.log(el.role, role)
+        return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' ?
+          <Grid key={i} container display="flex" alignItems="center" >
+            <li></li>
+            <Link to={url + el.path + window.location.search} style={{flexGrow: 1}}>{el.label}</Link>
+            <p>Отправлено файлов: {numbers[formData[i].main_title]}</p>
+          </Grid> : null
+      })}
+      <br/>
+      
+      <Switch>
+        <Route exact path={path}>
+          <History />
+        </Route>
+        <Route path={path + "/:form"}>
+          <Template />
+        </Route>
+      </Switch>
+      </div> : null}
+            
     </>
   );
 };

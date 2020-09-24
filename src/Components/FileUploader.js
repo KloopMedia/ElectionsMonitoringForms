@@ -184,12 +184,15 @@ const FileUploader = (props) => {
         let userRef = rootRef.doc(currentUser.uid)
         setSnackbar(true)
         let filesRef = userRef.collection("files")
+        console.log("Файл отправлен")
         filesRef.add(
           {
             filepath: value.url,
             answer_number: value.index,
             answer_id: formId,
-            answer_subnumber: value.subindex
+            answer_subnumber: value.subindex,
+            form_name: data.main_title,
+            date: new Date()
           }
         ).then(() => setSpinner(false)).catch(error => alert(error))
       }

@@ -94,12 +94,17 @@ const App = () => {
     <div className={classes.app}>
         <Router>
         <div>
-        <li>
-          <Link to={"/ElectionsMonitoringForms/form" + window.location.search}>На главную</Link>
-        </li>
-        <li>
-          <Link to={"/ElectionsMonitoringForms/files" + window.location.search}>Форма для отправки файлов</Link>
-        </li>
+        {currentUser ? 
+        <nav>
+          <ul>
+            <li>
+              <Link to={"/ElectionsMonitoringForms/form" + window.location.search}>На главную</Link>
+            </li>
+            <li>
+              <Link to={"/ElectionsMonitoringForms/files" + window.location.search}>Форма для отправки файлов</Link>
+            </li>
+          </ul>
+        </nav> : <Redirect to={"/ElectionsMonitoringForms/login" + window.location.search} />}
           <Switch>
             <PrivateRoute exact path={"/ElectionsMonitoringForms/form"} component={Home} />
             <Route path="/ElectionsMonitoringForms/login" component={Login} />

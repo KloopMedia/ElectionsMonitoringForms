@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "/ElectionsMonitoringForms/static/css/main.8eb32c48.chunk.css",
-    "main.js": "/ElectionsMonitoringForms/static/js/main.e97cb9d9.chunk.js",
-    "main.js.map": "/ElectionsMonitoringForms/static/js/main.e97cb9d9.chunk.js.map",
+    "main.js": "/ElectionsMonitoringForms/static/js/main.55cadcd5.chunk.js",
+    "main.js.map": "/ElectionsMonitoringForms/static/js/main.55cadcd5.chunk.js.map",
     "runtime-main.js": "/ElectionsMonitoringForms/static/js/runtime-main.f10c6baa.js",
     "runtime-main.js.map": "/ElectionsMonitoringForms/static/js/runtime-main.f10c6baa.js.map",
-    "static/js/2.ebdf4800.chunk.js": "/ElectionsMonitoringForms/static/js/2.ebdf4800.chunk.js",
-    "static/js/2.ebdf4800.chunk.js.map": "/ElectionsMonitoringForms/static/js/2.ebdf4800.chunk.js.map",
+    "static/js/2.26ccf684.chunk.js": "/ElectionsMonitoringForms/static/js/2.26ccf684.chunk.js",
+    "static/js/2.26ccf684.chunk.js.map": "/ElectionsMonitoringForms/static/js/2.26ccf684.chunk.js.map",
     "index.html": "/ElectionsMonitoringForms/index.html",
-    "precache-manifest.abb4736b629dfc5d369269b84c8a1b8b.js": "/ElectionsMonitoringForms/precache-manifest.abb4736b629dfc5d369269b84c8a1b8b.js",
+    "precache-manifest.846483a644c28b5b81ff9f96d24ae6e4.js": "/ElectionsMonitoringForms/precache-manifest.846483a644c28b5b81ff9f96d24ae6e4.js",
     "service-worker.js": "/ElectionsMonitoringForms/service-worker.js",
     "static/css/main.8eb32c48.chunk.css.map": "/ElectionsMonitoringForms/static/css/main.8eb32c48.chunk.css.map",
-    "static/js/2.ebdf4800.chunk.js.LICENSE.txt": "/ElectionsMonitoringForms/static/js/2.ebdf4800.chunk.js.LICENSE.txt"
+    "static/js/2.26ccf684.chunk.js.LICENSE.txt": "/ElectionsMonitoringForms/static/js/2.26ccf684.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.f10c6baa.js",
-    "static/js/2.ebdf4800.chunk.js",
+    "static/js/2.26ccf684.chunk.js",
     "static/css/main.8eb32c48.chunk.css",
-    "static/js/main.e97cb9d9.chunk.js"
+    "static/js/main.55cadcd5.chunk.js"
   ]
 }

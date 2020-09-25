@@ -15,20 +15,15 @@ export const AuthProvider = ({ children }) => {
       let userRef = rootRef.doc(user.uid)
       userRef.get().then(doc => {
         if (doc && doc.exists) {
-          if (doc.data().role) {
-            userRef.set(
-              {
-                name: user.displayName,
-                role: doc.data().role
-              }
-            )
-          }
+            // pass
         }
         else {
           userRef.set(
             {
               name: user.displayName,
-              role: 'independent'
+              role: 'independent',
+              district: 'none',
+              email: user.email
             }
           )
         }

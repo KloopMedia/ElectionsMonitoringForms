@@ -101,7 +101,7 @@ const Home = (props) => {
      {formData && role ? <div>
       {forms.map((el, i) => {
         console.log(el.role, role)
-        return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' ?
+        return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
           <Grid key={i} container display="flex" alignItems="center" >
             <li></li>
             <Link to={url + el.path + window.location.search} style={{flexGrow: 1}}>{el.label}</Link>

@@ -110,14 +110,12 @@ const FileUploader = (props) => {
             keys.forEach(key => {
               console.log(key)
               if (a[i][key] === question.subquestion[key].on) {
-                setNo(false)
                 fileInputs.push({title: question.subquestion[key].q, index: i, subindex: key})
               }
             })
           }
         }
         else {
-          setNo(false)
           fileInputs.push({title: question.title, index: i})
         }
       }
@@ -248,7 +246,7 @@ const FileUploader = (props) => {
           </div>
         )
       })}
-      {noAttachments ? <Typography variant="h6" align="center">К этой форме нельзя приложить файл</Typography> : <div>
+      {Array.isArray(inputs) && inputs.length ? <div>
         <Grid container justify="center" style={{paddingTop: 20, paddingBottom: 20}}>
           <Button variant="contained" onClick={uploadFiles}>Отправить</Button>
         </Grid>
@@ -257,7 +255,7 @@ const FileUploader = (props) => {
           {spinner ? <CircularProgress /> : null}
         </Grid>
         {/* <LinearProgressWithLabel value={progress} /> */}
-      </div>
+      </div> : <Typography variant="h6" align="center">К этой форме нельзя приложить файл</Typography>
       }
 
       <Snackbar

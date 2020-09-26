@@ -80,7 +80,7 @@ const App = () => {
       let userRef = rootRef.doc(currentUser.uid)
       userRef.get().then(doc => setUserData(doc.data()))
     }
-  })
+  }, [])
 
   return (
     <div>

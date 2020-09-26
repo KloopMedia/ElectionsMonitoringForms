@@ -32,15 +32,12 @@ const Home = (props) => {
     let userRef = rootRef.doc(currentUser.uid)
     userRef.get().then(doc => setRole(doc.data().role))
     let urlString = queryString.parse(window.location.search)
-    console.log(urlString)
 		if (urlString.url) {
 			fetch(urlString.url)
 				.then((response) => {
-					console.log("RESPONSE", response)
 					return response.json();
 				})
 				.then((data) => {
-					console.log("DATA", data);
           setForms(data)
           let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
           Promise.all(formData).then(arr => {
@@ -100,7 +97,6 @@ const Home = (props) => {
     <br />
      {formData && role ? <div>
       {forms.map((el, i) => {
-        console.log(el.role, role)
         return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
           <Grid key={i} container display="flex" alignItems="center" >
             <li></li>

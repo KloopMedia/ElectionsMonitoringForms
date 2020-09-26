@@ -64,6 +64,8 @@ const useStyles = makeStyles( theme => ({
 }));
 
 const App = () => {
+  const [userData, setUserData] = useState(null)
+
   const { currentUser } = useContext(AuthContext);
   const classes = useStyles();
 
@@ -72,6 +74,14 @@ const App = () => {
     email = currentUser.email
   }
 
+  useEffect(() => {
+    if (currentUser) {
+      let rootRef = firebase.firestore().collection('users')
+      let userRef = rootRef.doc(currentUser.uid)
+      userRef.get().then(doc => setUserData(doc.data()))
+    }
+  })
+
   return (
     <div>
       <AppBar position="static" className={classes.appbar}>
@@ -79,9 +89,18 @@ const App = () => {
         <Grid style={{flexGrow: 1}}>
           <img src="https://kloop.kg/wp-content/uploads/2017/01/kloop_transparent_site.png" alt="Kloop.kg - Новости Кыргызстана" style={{width: '180px', height: 'auto'}}/>
         </Grid>
-        <Typography variant="body1" style={{color: '#003366'}}>
+        <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
           {email}
         </Typography>
+        {userData && userData.district ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+          {userData.district}
+        </Typography> : null}
+        {userData && userData.polling_station ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+          {userData.polling_station}
+        </Typography> : null}
+        {userData && userData.role ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+          {userData.role}
+        </Typography> : null}
         {currentUser 
         ? <Button style={{marginLeft: 10, fontSize: 12}} size="small" variant="outlined" color="#003366" onClick={() => firebase.auth().signOut()}>
             выход

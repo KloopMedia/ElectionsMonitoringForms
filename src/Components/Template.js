@@ -73,7 +73,8 @@ const Template = (props) => {
       try {
         let short = shortAnswers
         let name = data.main_title
-        setMessage({answers: short, form_name: name})
+        let form_url = formData.url
+        setMessage({answers: short, form_name: name, form_url: form_url})
 
         let urlString = queryString.parse(window.location.search)
         const response = await fetch(urlString.url);

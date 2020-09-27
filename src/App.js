@@ -2,7 +2,7 @@ import React, {useContext, useState, useEffect} from 'react';
 import "./App.css"
 
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Switch,
   Route,
   Link,
@@ -92,13 +92,13 @@ const App = () => {
         <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
           {email}
         </Typography>
-        {userData && userData.district ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+        {currentUser && userData && userData.district ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
           {userData.district}
         </Typography> : null}
-        {userData && userData.polling_station ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+        {currentUser && userData && userData.polling_station ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
           {userData.polling_station}
         </Typography> : null}
-        {userData && userData.role ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+        {currentUser && userData && userData.role ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
           {userData.role}
         </Typography> : null}
         {currentUser 
@@ -117,22 +117,23 @@ const App = () => {
         <nav>
           <ul>
             <li>
-              <Link to={"/ElectionsMonitoringForms/form" + window.location.search}>На главную</Link>
+              <Link to={"/form"}>На главную</Link>
             </li>
             <li>
-              <Link to={"/ElectionsMonitoringForms/files" + window.location.search}>Форма для отправки файлов</Link>
+              <Link to={"/files"}>Форма для отправки файлов</Link>
             </li>
           </ul>
-        </nav> : <Redirect to={"/ElectionsMonitoringForms/login" + window.location.search} />}
+        </nav> : <Redirect to={"/login"} />}
+
           <Switch>
-            <PrivateRoute exact path={"/ElectionsMonitoringForms/form"} component={Home} />
-            <Route path="/ElectionsMonitoringForms/login" component={Login} />
-            <Route path="/ElectionsMonitoringForms/signup" component={SignUp} />
-            <Route path={"/ElectionsMonitoringForms/form/:form"}>
+            <PrivateRoute exact path={"/form"} component={Home} />
+            <Route path="/login" component={Login} />
+            <Route path="/signup" component={SignUp} />
+            <Route path={"/form/:form"}>
               <Template />
             </Route>
-            <Route exact path="/ElectionsMonitoringForms/files" component={withRouter(FileUploader)} />
-            <Route path="/ElectionsMonitoringForms/files/:id" component={withRouter(FileUploader)} />
+            <Route exact path="/files" component={withRouter(FileUploader)} />
+            <Route path="/files/:id" component={withRouter(FileUploader)} />
           </Switch>
         </div>
       </Router>

@@ -182,7 +182,7 @@ const Template = (props) => {
     };
 
     const HandleRedirect = () => {
-      return <Redirect to={"/ElectionsMonitoringForms/files"} />
+      return <Redirect to={"/files"} />
     }
     
     let questionList = ready ? data.questions.map((el, i) => {
@@ -216,7 +216,7 @@ const Template = (props) => {
           <p>Начало: {data.period.start}</p>
           <p>Конец: {data.period.finish}</p>
         </div> : null}
-        {showFileUpload ? <Redirect to={"/ElectionsMonitoringForms/files" + window.location.search} /> : null}
+        {showFileUpload ? <Redirect to={"/files"} /> : null}
         {/* {showFileUpload ? <HandleRedirect /> : null} */}
         <div>
           {questionList}

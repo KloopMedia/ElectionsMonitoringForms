@@ -43,7 +43,7 @@ const History = () => {
                d.getSeconds().toString().length < 2 ? '0' + d.getSeconds() : d.getSeconds()].join(':').toString();
 			return (
 				<Grid container alignItems="center">
-					<Link to={"/ElectionsMonitoringForms/files/" + form.id + window.location.search} style={{flexGrow: 1, paddingRight: 20}}>{form.data.form_name}</Link>
+					<Link to={"/files/" + form.id} style={{flexGrow: 1, paddingRight: 20}}>{form.data.form_name}</Link>
 					<p>{date}</p>
 				</Grid>
 			)}) : 

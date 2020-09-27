@@ -28,7 +28,7 @@ export default function RadioButton(props) {
 					{props.answers.map((el, i) => <FormControlLabel 
 													key={i} 
 													value={el} 
-													control={<Radio/>} 
+													control={<Radio color="primary" />} 
 													label={el} 
 													disabled={props.locked ? true : false} />)}
 				</RadioGroup>

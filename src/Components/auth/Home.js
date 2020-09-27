@@ -42,7 +42,7 @@ const Home = (props) => {
           let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
           Promise.all(formData).then(arr => {
             setData(arr)
-            loadNumberOfFiles(arr)
+            // loadNumberOfFiles(arr)
           })
 				});
 		} else {
@@ -50,26 +50,27 @@ const Home = (props) => {
 		}
   },[])
 
-  const loadNumberOfFiles = (d) => {
-    let rootRef = firebase.firestore().collection('responses')
-    let userRef = rootRef.doc(currentUser.uid)
-    let filesRef = userRef.collection("files")
-    filesRef.get().then(querySnapshot => {
-      let files = {}
-      d.forEach(form => files[form.main_title] = 0)
-      querySnapshot.forEach(doc => {
-        if (doc && doc.exists) {
-          let data = doc.data()
-          d.forEach(form => {
-            if (data.form_name === form.main_title) {
-              files[form.main_title] += 1
-            }
-          })
-        }
-      });
-      setNumbers(files)
-    })
-  }
+  // Количество отправленных файлов
+  // const loadNumberOfFiles = (d) => {
+  //   let rootRef = firebase.firestore().collection('responses')
+  //   let userRef = rootRef.doc(currentUser.uid)
+  //   let filesRef = userRef.collection("files")
+  //   filesRef.get().then(querySnapshot => {
+  //     let files = {}
+  //     d.forEach(form => files[form.main_title] = 0)
+  //     querySnapshot.forEach(doc => {
+  //       if (doc && doc.exists) {
+  //         let data = doc.data()
+  //         d.forEach(form => {
+  //           if (data.form_name === form.main_title) {
+  //             files[form.main_title] += 1
+  //           }
+  //         })
+  //       }
+  //     });
+  //     setNumbers(files)
+  //   })
+  // }
 
   const timeManager = (data) => {
     let now = new Date();
@@ -96,23 +97,34 @@ const Home = (props) => {
     <>
     <br />
      {formData && role ? <div>
+     <ul>
       {forms.map((el, i) => {
+        return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
+          <li key={i} style={{padding: 5}}>
+            <Link to={url + el.path}>{el.label}</Link>
+          </li> : null
+      })}
+      </ul>
+
+
+      {/* {forms.map((el, i) => {
         return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
           <Grid key={i} container display="flex" alignItems="center" >
             <li></li>
             <Link to={url + el.path + window.location.search} style={{flexGrow: 1}}>{el.label}</Link>
             <p>Отправлено файлов: {numbers[formData[i].main_title]}</p>
           </Grid> : null
-      })}
+      })} */}
+
       <br/>
       
       <Switch>
         <Route exact path={path}>
           <History />
         </Route>
-        <Route path={path + "/:form"}>
+        {/* <Route path={path + "/:form"}>
           <Template />
-        </Route>
+        </Route> */}
       </Switch>
       </div> : null}
             

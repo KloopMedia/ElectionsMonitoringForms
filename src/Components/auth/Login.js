@@ -12,7 +12,7 @@ const Login = ({ history }) => {
   let { url } = useRouteMatch();
 
   if (currentUser) {
-    return <Redirect to={'/ElectionsMonitoringForms/form' + window.location.search} />;
+    return <Redirect to={'/form'} />;
   }
 
   return (

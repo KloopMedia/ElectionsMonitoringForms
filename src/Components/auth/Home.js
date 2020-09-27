@@ -30,7 +30,7 @@ const Home = (props) => {
   useEffect(() => {
     let rootRef = firebase.firestore().collection('users')
     let userRef = rootRef.doc(currentUser.uid)
-    userRef.get().then(doc => setRole(doc.data().role))
+    userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
     let urlString = queryString.parse(window.location.search)
 		if (urlString.url) {
 			fetch(urlString.url)

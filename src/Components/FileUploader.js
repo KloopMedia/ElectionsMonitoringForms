@@ -164,7 +164,8 @@ const FileUploader = (props) => {
             console.log("Файл отправлен")
             filesRef.add(
               {
-                filepath: url,
+                public_url: url,
+                filename: file.name,
                 answer_number: value.index,
                 answer_id: formId,
                 answer_subnumber: value.subindex,

@@ -101,7 +101,7 @@ const Home = (props) => {
       {forms.map((el, i) => {
         return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
           <li key={i} style={{padding: 5}}>
-            <Link to={url + el.path}>{el.label}</Link>
+            <Link style={{textDecoration: 'none'}} to={url + el.path}>{el.label}</Link>
           </li> : null
       })}
       </ul>

@@ -172,7 +172,8 @@ const FileUploader = (props) => {
                 answer_id: formId,
                 answer_subnumber: value.subindex,
                 form_name: data.main_title,
-                date: new Date()
+                date: new Date(),
+                identifier: data.identifier
               }
             ).then(() => setSpinner(false)).catch(error => alert(error))
           })

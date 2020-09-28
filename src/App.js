@@ -117,10 +117,10 @@ const App = () => {
         <nav>
           <ul>
             <li>
-              <Link style={{textDecoration: 'none'}} to={"/form"}>На главную</Link>
+              <Link style={{textDecoration: 'none'}} to={"/form"}>На главную / Башкы бетке</Link>
             </li>
             <li>
-              <Link style={{textDecoration: 'none'}} to={"/files"}>Форма для отправки файлов</Link>
+              <Link style={{textDecoration: 'none'}} to={"/files"}>Форма для отправки файлов / Файл жөнөтүү үчүн форма</Link>
             </li>
           </ul>
         </nav> : <Redirect to={"/login"} />}

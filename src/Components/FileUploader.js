@@ -105,11 +105,13 @@ const FileUploader = (props) => {
       if (question.attachMaterials) {
         if(question.type === 'multiradio') {
           if (a[i]) {
-            console.log("ANS", a)
+            // console.log("ANS", a)
             let keys = Object.keys(a[i])
             keys.forEach(key => {
-              console.log(key)
-              if (a[i][key] === question.subquestion[key].on) {
+              // console.log(a[i][key])
+              // console.log(question.subquestion[key].on)
+              if (a[i][key].toString() === question.subquestion[key].on) {
+                // console.log(question.answer[a[i][key]])
                 fileInputs.push({title: question.subquestion[key].q, index: i, subindex: key})
               }
             })

@@ -38,7 +38,7 @@ const useStyles = makeStyles( theme => ({
     width: '70%',
     },
     [theme.breakpoints.up('md')]: {
-    width: '50%',
+    width: '55%',
     },
     title: {
       fontColor: 'blue'

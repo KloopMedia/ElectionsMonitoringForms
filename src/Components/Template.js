@@ -92,7 +92,7 @@ const Template = (props) => {
         console.log(data.main_title)
         answersRef.add(
           {
-            answers: fullAnswers,
+            answers: shortAnswers,
             form_name: data.main_title,
             form_url: formData.url,
             date: new Date()

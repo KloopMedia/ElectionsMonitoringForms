@@ -32,7 +32,7 @@ const History = () => {
   return (
     <>
 		<Typography variant="h4" align="center">История</Typography>
-      {formData ? formData.map(form => {
+      {formData ? formData.map((form, i) => {
 				let d = new Date({...form.data.date}.seconds * 1000)
 				let date = [
 							d.getDate().toString().length < 2 ? '0' + d.getDate() : d.getDate(),
@@ -42,7 +42,7 @@ const History = () => {
                d.getMinutes().toString().length < 2 ? '0' + d.getMinutes() : d.getMinutes(),
                d.getSeconds().toString().length < 2 ? '0' + d.getSeconds() : d.getSeconds()].join(':').toString();
 			return (
-				<Grid container alignItems="center">
+				<Grid key={i} container alignItems="center">
 					<Link to={"/files/" + form.id} style={{flexGrow: 1, paddingRight: 20, textDecoration: 'none'}}>{form.data.form_name}</Link>
 					<p>{date}</p>
 				</Grid>

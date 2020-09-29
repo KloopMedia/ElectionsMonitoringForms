@@ -15,6 +15,9 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import { Button } from '@material-ui/core';
 import Typography from '@material-ui/core/Typography'
+import Box from '@material-ui/core/Box'
+import AssignmentIcon from '@material-ui/icons/Assignment';
+import Tooltip from '@material-ui/core/Tooltip'
 
 const queryString = require('query-string');
 
@@ -32,11 +35,16 @@ const Template = (props) => {
     const [ready, setReady] = useState(false)
     const [formData, setForm] = useState(null)
     const [message, setMessage] = useState(null)
+    const [connection, setConnection] = useState(true)
+    const [userData, setUserData] = useState(null)
 
     const { currentUser } = useContext(AuthContext);
     let { form } = useParams();
   
     useEffect(() => {
+      // firebase.firestore().collection('users').doc(currentUser.uid).get().then(doc => {
+      //   setUserData(doc.data())
+      // })
       let urlString = queryString.parse(window.location.search)
       console.log(urlString)
       if (urlString.url) {
@@ -68,36 +76,50 @@ const Template = (props) => {
         console.log("ERROR: no url detected")
       }
     },[])
+
+    const checkOnlineStatus = async () => {
+      try {
+        setMessage({
+          answers: shortAnswers, 
+          form_name: data.main_title, 
+          form_url: formData.url, 
+          identifier: data.identifier, 
+          user_id: currentUser.uid, 
+          user_email: currentUser.email,
+          // polling_station: userData.polling_station
+        })
+        const online = await fetch(formData.url, {cache: "no-store"})
+        .then(r => {
+          uploadData()
+          console.log('internet')
+        })
+        .catch(err => {
+          setShowAnswers(true)
+          console.log('no internet')
+        })
+        return online.status >= 200 && online.status < 300; // either true or false
+      } catch (err) {
+        // setShowAnswers(true)
+        return false; // definitely offline
+      }
+    };
   
     const uploadData = async () => {
       try {
-        let short = shortAnswers
-        let name = data.main_title
-        let form_url = formData.url
-        let identifier = data.identifier
-        setMessage({answers: short, form_name: name, form_url: form_url, identifier: identifier})
-
-        let urlString = queryString.parse(window.location.search)
-        const response = await fetch(urlString.url);
-        if (!response.ok) {
-          setShowAnswers(true)
-          throw new Error('Ответ сети был не ok.');
-        }
-
         let rootRef = firebase.firestore().collection("responses")
         let userRef = rootRef.doc(currentUser.uid)
         userRef.set({email: currentUser.email})
         let answersRef = userRef.collection("answers")
-        console.log(formData)
-        console.log(fullAnswers)
-        console.log(data.main_title)
         answersRef.add(
           {
             answers: shortAnswers,
             identifier: data.identifier,
             form_name: data.main_title,
             form_url: formData.url,
-            date: new Date()
+            date: new Date(),
+            user_id: currentUser.uid,
+            user_email: currentUser.email,
+            // polling_station: userData.polling_station
           }
         ).then(doc => {
           setSnackbar(true)
@@ -108,7 +130,6 @@ const Template = (props) => {
           console.log(error)
         })
         console.log("data uploaded")
-        setShowAnswers(true)
       }
       catch (err) {
         alert(err)
@@ -222,12 +243,27 @@ const Template = (props) => {
         {/* {showFileUpload ? <HandleRedirect /> : null} */}
         <div>
           {questionList}
+          {showAnswers ? 
+          <div style={{paddingTop: 30, paddingBottom: 20}}>
+            <Typography variant="h5" align="center">Нет интернет соединения:</Typography>
+            <Typography variant="h6" align="center">Отправьте текст ниже (вместе с фигурными скобками) на номер: <span style={{fontWeight: 600}}>0551300832</span></Typography>
+            <Box border={3} borderRadius={16} borderColor="primary.main" style={{borderStyle: "dashed", position: 'relative'}}>
+              <Box position="absolute" top={0} right={0}>
+                <Tooltip title="Скопировать в буфер обмена">
+                  <IconButton aria-label="copy" size="small" onClick={() => {navigator.clipboard.writeText(JSON.stringify(message))}}>
+                    <AssignmentIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+              <Typography variant="body1" fullwidth style={{textAlign: "left", overflowWrap: "anywhere", padding: 10}}>{JSON.stringify(message)}</Typography>
+            </Box>
+          </div>
+        : null}
           <div style={{paddingTop: 20, paddingBottom: 20, textAlign: "center"}}>
-            <Button variant="outlined" style={{borderWidth: 2, borderColor: "#003366", color: '#003366', margin: 10}} disabled={locked ? true : false} onClick={uploadData}>Отправить</Button>
+            <Button variant="outlined" style={{borderWidth: 2, borderColor: "#003366", color: '#003366', margin: 10}} disabled={locked ? true : false} onClick={checkOnlineStatus}>Отправить</Button>
             {uploadSuccsess ? <Button variant="outlined" style={{borderWidth: 2, borderColor: "red", color: 'red', margin: 10}} disabled={locked ? true : false} onClick={() => setFileUpload(true)}>Перейти к загрузке файлов</Button> : null }
           </div>
         </div>
-        {showAnswers ? <p style={{textAlign: "left"}}>Короткий ответ: {JSON.stringify(message)}</p> : null}
         <Snackbar
           anchorOrigin={{
             vertical: 'bottom',

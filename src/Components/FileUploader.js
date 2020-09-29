@@ -24,6 +24,8 @@ const FileUploader = (props) => {
   const [formId, setId] = useState(null)
   const [spinner, setSpinner] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [formAnswer, setFormAnswer] = useState(null)
+  const [userData, setUserData] = useState(null)
 
   const { currentUser } = useContext(AuthContext);
   let { id } = useParams();
@@ -38,6 +40,9 @@ const FileUploader = (props) => {
   }, [])
 
   const loadAttachmentQuestions = () => {
+    // firebase.firestore().collection('users').doc(currentUser.uid).get().then(doc => {
+    //   setUserData(doc.data())
+    // })
     let rootRef = firebase.firestore().collection('responses')
     let userRef = rootRef.doc(currentUser.uid)
     let answersRef = userRef.collection("answers")
@@ -46,6 +51,7 @@ const FileUploader = (props) => {
         setAnswers(doc.data().answers)
         setId(doc.id)
         downloadData(doc.data())
+        setFormAnswer(doc.data())
       })
     }
     else {
@@ -56,6 +62,7 @@ const FileUploader = (props) => {
             setAnswers(doc.data().answers)
             setId(doc.id)
             downloadData(doc.data())
+            setFormAnswer(doc.data())
           }
         });
       })
@@ -173,7 +180,11 @@ const FileUploader = (props) => {
                 answer_subnumber: value.subindex,
                 form_name: data.main_title,
                 date: new Date(),
-                identifier: data.identifier
+                identifier: data.identifier,
+                user_id: currentUser.uid,
+                user_email: currentUser.email,
+                form_url: formAnswer.form_url,
+                // polling_station: userData.polling_station
               }
             ).then(() => setSpinner(false)).catch(error => alert(error))
           })
@@ -194,7 +205,12 @@ const FileUploader = (props) => {
             answer_id: formId,
             answer_subnumber: value.subindex,
             form_name: data.main_title,
-            date: new Date()
+            date: new Date(),
+            identifier: data.identifier,
+            user_id: currentUser.uid,
+            user_email: currentUser.email,
+            form_url: formAnswer.form_url,
+            // polling_station: userData.polling_station
           }
         ).then(() => setSpinner(false)).catch(error => alert(error))
       }

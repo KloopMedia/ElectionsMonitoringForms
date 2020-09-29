@@ -69,10 +69,6 @@ const App = () => {
   const { currentUser } = useContext(AuthContext);
   const classes = useStyles();
 
-  let email = ""
-  if (currentUser && currentUser.email) {
-    email = currentUser.email
-  }
 
   useEffect(() => {
     if (currentUser) {
@@ -87,22 +83,10 @@ const App = () => {
       <AppBar position="static" className={classes.appbar}>
       <Toolbar>
         <Grid style={{flexGrow: 1}}>
-          <img src="https://kloop.kg/wp-content/uploads/2017/01/kloop_transparent_site.png" alt="Kloop.kg - Новости Кыргызстана" style={{width: '180px', height: 'auto'}}/>
+          <img src="https://kloop.kg/wp-content/uploads/2017/01/kloop_transparent_site.png" alt="Kloop.kg - Новости Кыргызстана" style={{width: 150, height: 'auto'}}/>
         </Grid>
-        <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          {email}
-        </Typography>
-        {currentUser && userData && userData.district ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          {userData.district}
-        </Typography> : null}
-        {currentUser && userData && userData.polling_station ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          {userData.polling_station}
-        </Typography> : null}
-        {currentUser && userData && userData.role ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          {userData.role}
-        </Typography> : null}
         {currentUser 
-        ? <Button style={{marginLeft: 10, fontSize: 12}} size="small" variant="outlined" color="#003366" onClick={() => firebase.auth().signOut()}>
+        ? <Button style={{borderColor: "#003366", color: '#003366', marginLeft: 10, fontSize: 12}} size="small" variant="outlined" onClick={() => firebase.auth().signOut()}>
             выход
         </Button>
         : null
@@ -111,7 +95,19 @@ const App = () => {
     </AppBar>
     <Grid container justify="center">
     <div className={classes.app}>
-        <Router>
+        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+          Почта: {currentUser.email ? currentUser.email : "none"}
+        </Typography> : null}
+        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+          Район: {userData && userData.district ? userData.district : "none"}
+        </Typography> : null}
+        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+          № УИК: {userData && userData.polling_station ? userData.polling_station : "none"}
+        </Typography> : null}
+        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
+          Роль: {userData && userData.role ? userData.role : "none"}
+        </Typography> : null}
+      <Router>
         <div>
         {currentUser ? 
         <nav>

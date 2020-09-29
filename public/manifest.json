@@ -18,8 +18,8 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
-  "display": "browser",
+  "start_url": "https://kloopmedia.github.io/ElectionsMonitoringForms/?url=https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/config_v2.json#/form",
+  "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"
 }

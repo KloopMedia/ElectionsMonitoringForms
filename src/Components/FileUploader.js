@@ -135,7 +135,7 @@ const FileUploader = (props) => {
     if (reason === 'clickaway') {
       return;
     }
-    setSnackbar(true)
+    setSnackbar(false)
   };
 
   const handleFileChange = (event, index, subindex, i) => {

@@ -88,7 +88,7 @@ const Template = (props) => {
           user_email: currentUser.email,
           // polling_station: userData.polling_station
         })
-        const online = await fetch(formData.url, {cache: "no-store"})
+        const online = await fetch("https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/config.json", {cache: "no-store"})
         .then(r => {
           uploadData()
           console.log('internet')

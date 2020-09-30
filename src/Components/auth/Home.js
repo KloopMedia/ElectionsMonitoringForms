@@ -23,7 +23,6 @@ const Home = (props) => {
   const [numbers, setNumbers] = useState({})
   const [formData, setData] = useState(null)
   const [role, setRole] = useState(null)
-  const [map, setMap] = useState(false)
 
   const { currentUser } = useContext(AuthContext);
   let { path, url } = useRouteMatch();
@@ -51,24 +50,6 @@ const Home = (props) => {
 		}
   },[])
 
-  const loadData = () => {
-    let urlString = queryString.parse(window.location.search)
-    fetch(urlString.url)
-				.then((response) => {
-          console.log("RESPONSE", response)
-					return response.json();
-				})
-				.then((data) => {
-          console.log("DATA", data)
-          setForms(data)
-          let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
-          Promise.all(formData).then(arr => {
-            setData(arr)
-            // loadNumberOfFiles(arr)
-          })
-				});
-  }
-
   // Количество отправленных файлов
   // const loadNumberOfFiles = (d) => {
   //   let rootRef = firebase.firestore().collection('responses')
@@ -91,43 +72,40 @@ const Home = (props) => {
   //   })
   // }
 
-  const timeManager = (data) => {
-    let now = new Date();
-    let start = new Date(data.period.start);
-    let finish = new Date(data.period.finish)
+  // const timeManager = (data) => {
+  //   let now = new Date();
+  //   let start = new Date(data.period.start);
+  //   let finish = new Date(data.period.finish)
 
-    if (start > now && data.period.before.nofill) {
-      return true
-    }
-    else if (start < now && now < finish && data.period.in.nofill) {
-      return true
-    }
-    else if (now > finish && data.period.after.nofill) {
-      return true
-    }
-    else {
-      return false
-    }
-  }
+  //   if (start > now && data.period.before.nofill) {
+  //     return true
+  //   }
+  //   else if (start < now && now < finish && data.period.in.nofill) {
+  //     return true
+  //   }
+  //   else if (now > finish && data.period.after.nofill) {
+  //     return true
+  //   }
+  //   else {
+  //     return false
+  //   }
+  // }
 
   
 
   return (
     <>
-    <button onClick={loadData}>Load data test</button>
-    <button onClick={() => setMap(!map)}>map</button>
     <br />
      {formData && role ? <div>
-     <ul>
+     {/* <ul>
       {forms.map((el, i) => {
         return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
           <li key={i} style={{padding: 5}}>
             <Link style={{textDecoration: 'none'}} to={url + el.path}>{el.label}</Link>
           </li> : null
       })}
-      </ul>
+      </ul> */}
 
-      {map ? forms.map((el, i) => <p>{el.path}</p>) : null}
 
       {/* {forms.map((el, i) => {
         return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?

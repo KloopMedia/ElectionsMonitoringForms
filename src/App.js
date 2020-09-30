@@ -1,4 +1,4 @@
-import React, {useContext, useState, useEffect} from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import "./App.css"
 
 import {
@@ -6,7 +6,8 @@ import {
   Switch,
   Route,
   Link,
-  withRouter, Redirect 
+  withRouter, Redirect,
+  useRouteMatch
 } from "react-router-dom";
 
 import Home from "./Components/auth/Home";
@@ -25,27 +26,28 @@ import Typography from '@material-ui/core/Typography';
 
 import { AuthContext } from "./util/Auth";
 import firebase from './util/Firebase';
-import { Button} from '@material-ui/core';
+import { Button } from '@material-ui/core';
 
+const queryString = require('query-string');
 
-const useStyles = makeStyles( theme => ({
+const useStyles = makeStyles(theme => ({
   app: {
     padding: '10px',
     [theme.breakpoints.down('sm')]: {
-        width: '100%',
-      },
+      width: '100%',
+    },
     [theme.breakpoints.up('sm')]: {
-    width: '70%',
+      width: '70%',
     },
     [theme.breakpoints.up('md')]: {
-    width: '55%',
+      width: '55%',
     },
     title: {
       fontColor: 'blue'
     }
   },
   appbar: {
-    background: 'transparent', 
+    background: 'transparent',
     boxShadow: 'none'
   },
   title: {
@@ -65,6 +67,11 @@ const useStyles = makeStyles( theme => ({
 
 const App = () => {
   const [userData, setUserData] = useState(null)
+  const [forms, setForms] = useState([])
+  const [numbers, setNumbers] = useState({})
+  const [formData, setData] = useState(null)
+  const [role, setRole] = useState(null)
+  const [isMain, setMain] =useState(true)
 
   const { currentUser } = useContext(AuthContext);
   const classes = useStyles();
@@ -78,64 +85,114 @@ const App = () => {
     }
   }, [])
 
+  useEffect(() => {
+    let rootRef = firebase.firestore().collection('users')
+    let userRef = rootRef.doc(currentUser.uid)
+    userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
+    let urlString = queryString.parse(window.location.search)
+    if (urlString.url) {
+      fetch(urlString.url)
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setForms(data)
+          let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+          Promise.all(formData).then(arr => {
+            setData(arr)
+            // loadNumberOfFiles(arr)
+          })
+        });
+    } else {
+      console.log("ERROR: no url detected")
+    }
+  }, [])
+
+  const timeManager = (data) => {
+    let now = new Date();
+    let start = new Date(data.period.start);
+    let finish = new Date(data.period.finish)
+
+    if (start > now && data.period.before.nofill) {
+      return true
+    }
+    else if (start < now && now < finish && data.period.in.nofill) {
+      return true
+    }
+    else if (now > finish && data.period.after.nofill) {
+      return true
+    }
+    else {
+      return false
+    }
+  }
+
   return (
     <div>
       <AppBar position="static" className={classes.appbar}>
-      <Toolbar>
-        <Grid style={{flexGrow: 1}}>
-          <img src="https://kloop.kg/wp-content/uploads/2017/01/kloop_transparent_site.png" alt="Kloop.kg - Новости Кыргызстана" style={{width: 150, height: 'auto'}}/>
-        </Grid>
-        {currentUser 
-        ? <Button style={{borderColor: "#003366", color: '#003366', marginLeft: 10, fontSize: 12}} size="small" variant="outlined" onClick={() => firebase.auth().signOut()}>
-            выход
+        <Toolbar>
+          <Grid style={{ flexGrow: 1 }}>
+            <img src="https://kloop.kg/wp-content/uploads/2017/01/kloop_transparent_site.png" alt="Kloop.kg - Новости Кыргызстана" style={{ width: 150, height: 'auto' }} />
+          </Grid>
+          {currentUser
+            ? <Button style={{ borderColor: "#003366", color: '#003366', marginLeft: 10, fontSize: 12 }} size="small" variant="outlined" onClick={() => firebase.auth().signOut()}>
+              выход
         </Button>
-        : null
-        }
-      </Toolbar>
-    </AppBar>
-    <Grid container justify="center">
-    <div className={classes.app}>
-        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          Почта: {currentUser.email ? currentUser.email : "none"}
-        </Typography> : null}
-        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          Район: {userData && userData.district ? userData.district : "none"}
-        </Typography> : null}
-        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          № УИК: {userData && userData.polling_station ? userData.polling_station : "none"}
-        </Typography> : null}
-        {currentUser ? <Typography variant="body1" style={{color: '#003366', paddingLeft: 5, paddingRight: 5}}>
-          Роль: {userData && userData.role ? userData.role : "none"}
-        </Typography> : null}
-      <Router>
-        <div>
-        {currentUser ? 
-        <nav>
-          <ul>
-            <li>
-              <Link style={{textDecoration: 'none'}} to={"/form"}>На главную / Башкы бетке</Link>
-            </li>
-            <li>
-              <Link style={{textDecoration: 'none'}} to={"/files"}>Форма для отправки файлов / Файл жөнөтүү үчүн форма</Link>
-            </li>
+            : null
+          }
+        </Toolbar>
+      </AppBar>
+      <Grid container justify="center">
+        <div className={classes.app}>
+          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            Почта: {currentUser && currentUser.email ? currentUser.email : "none"}
+          </Typography> : null}
+          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            Район: {currentUser && userData && userData.district ? userData.district : "none"}
+          </Typography> : null}
+          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            № УИК: {currentUser && userData && userData.polling_station ? userData.polling_station : "none"}
+          </Typography> : null}
+          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            Роль: {currentUser && userData && userData.role ? userData.role : "none"}
+          </Typography> : null}
+          <Router>
+            <div>
+              {currentUser ?
+                <nav>
+                  <ul>
+                    <li style={{ padding: 5 }}>
+                      <Link style={{ textDecoration: 'none' }} to={"/form"} onClick={() => setMain(true)}>На главную / Башкы бетке</Link>
+                    </li>
+                    <li style={{ padding: 5 }}>
+                      <Link style={{ textDecoration: 'none' }} to={"/files"} onClick={() => setMain(false)}>Форма для отправки файлов / Файл жөнөтүү үчүн форма</Link>
+                    </li>
+                    {isMain && formData && role ? <div>
+                    {forms.map((el, i) => {
+                      return  timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
+                        <li key={i} style={{ padding: 5 }}>
+                          <Link style={{ textDecoration: 'none' }} to={'/form' + el.path} onClick={() => setMain(false)}>{el.label}</Link>
+                        </li> : null
+                    })}
+                    </div> : null}
           </ul>
         </nav> : <Redirect to={"/login"} />}
 
           <Switch>
-            <PrivateRoute exact path={"/form"} component={Home} />
-            <Route path="/login" component={Login} />
-            <Route path="/signup" component={SignUp} />
-            <Route path={"/form/:form"}>
-              <Template />
-            </Route>
-            <Route exact path="/files" component={withRouter(FileUploader)} />
-            <Route path="/files/:id" component={withRouter(FileUploader)} />
-          </Switch>
+              <PrivateRoute exact path={"/form"} component={Home} />
+              <Route path="/login" component={Login} />
+              <Route path="/signup" component={SignUp} />
+              <Route path={"/form/:form"}>
+                <Template />
+              </Route>
+              <Route exact path="/files" component={withRouter(FileUploader)} />
+              <Route path="/files/:id" component={withRouter(FileUploader)} />
+            </Switch>
         </div>
       </Router>
       </div>
     </Grid>
-    </div>
+    </div >
   );
 }
 

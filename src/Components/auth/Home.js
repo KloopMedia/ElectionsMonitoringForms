@@ -50,6 +50,22 @@ const Home = (props) => {
 		}
   },[])
 
+  const loadData = () => {
+    let urlString = queryString.parse(window.location.search)
+    fetch(urlString.url)
+				.then((response) => {
+					return response.json();
+				})
+				.then((data) => {
+          setForms(data)
+          let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+          Promise.all(formData).then(arr => {
+            setData(arr)
+            // loadNumberOfFiles(arr)
+          })
+				});
+  }
+
   // Количество отправленных файлов
   // const loadNumberOfFiles = (d) => {
   //   let rootRef = firebase.firestore().collection('responses')
@@ -95,6 +111,7 @@ const Home = (props) => {
 
   return (
     <>
+    <button onClick={loadData}>Load data test</button>
     <br />
      {formData && role ? <div>
      <ul>

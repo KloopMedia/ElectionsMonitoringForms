@@ -92,7 +92,8 @@ const App = () => {
       userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
       let urlString = queryString.parse(window.location.search)
       if (urlString.url) {
-        fetch(urlString.url)
+        // fetch(urlString.url)
+        fetch('https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/config_v2.json')
           .then((response) => {
             return response.json();
           })

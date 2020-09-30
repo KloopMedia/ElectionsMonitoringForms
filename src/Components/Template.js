@@ -246,7 +246,7 @@ const Template = (props) => {
           {showAnswers ? 
           <div style={{paddingTop: 30, paddingBottom: 20}}>
             <Typography variant="h5" align="center">Нет интернет соединения:</Typography>
-            <Typography variant="h6" align="center">Отправьте текст ниже (вместе с фигурными скобками) на номер: <span style={{fontWeight: 600}}>0551300832</span></Typography>
+            <Typography variant="h6" align="center">Отправьте текст ниже (вместе с фигурными скобками)</Typography>
             <Box border={3} borderRadius={16} borderColor="primary.main" style={{borderStyle: "dashed", position: 'relative'}}>
               <Box position="absolute" top={0} right={0}>
                 <Tooltip title="Скопировать в буфер обмена">

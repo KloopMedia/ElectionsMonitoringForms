@@ -23,6 +23,7 @@ const Home = (props) => {
   const [numbers, setNumbers] = useState({})
   const [formData, setData] = useState(null)
   const [role, setRole] = useState(null)
+  const [map, setMap] = useState(false)
 
   const { currentUser } = useContext(AuthContext);
   let { path, url } = useRouteMatch();
@@ -54,9 +55,11 @@ const Home = (props) => {
     let urlString = queryString.parse(window.location.search)
     fetch(urlString.url)
 				.then((response) => {
+          console.log("RESPONSE", response)
 					return response.json();
 				})
 				.then((data) => {
+          console.log("DATA", data)
           setForms(data)
           let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
           Promise.all(formData).then(arr => {
@@ -112,6 +115,7 @@ const Home = (props) => {
   return (
     <>
     <button onClick={loadData}>Load data test</button>
+    <button onClick={() => setMap(!map)}>map</button>
     <br />
      {formData && role ? <div>
      <ul>
@@ -123,6 +127,7 @@ const Home = (props) => {
       })}
       </ul>
 
+      {map ? forms.map((el, i) => <p>{el.path}</p>) : null}
 
       {/* {forms.map((el, i) => {
         return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?

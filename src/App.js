@@ -86,25 +86,27 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    let rootRef = firebase.firestore().collection('users')
-    let userRef = rootRef.doc(currentUser.uid)
-    userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
-    let urlString = queryString.parse(window.location.search)
-    if (urlString.url) {
-      fetch(urlString.url)
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setForms(data)
-          let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
-          Promise.all(formData).then(arr => {
-            setData(arr)
-            // loadNumberOfFiles(arr)
+    if (currentUser) {
+      let rootRef = firebase.firestore().collection('users')
+      let userRef = rootRef.doc(currentUser.uid)
+      userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
+      let urlString = queryString.parse(window.location.search)
+      if (urlString.url) {
+        fetch(urlString.url)
+          .then((response) => {
+            return response.json();
           })
-        });
-    } else {
-      console.log("ERROR: no url detected")
+          .then((data) => {
+            setForms(data)
+            let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+            Promise.all(formData).then(arr => {
+              setData(arr)
+              // loadNumberOfFiles(arr)
+            })
+          });
+      } else {
+        console.log("ERROR: no url detected")
+      }
     }
   }, [])
 

@@ -9,16 +9,16 @@ self.addEventListener('install', event => {
 	event.waitUntil(
 		caches.open(staticCacheName)
 			.then(cache => {
-				// return fetch(filesToCache)
-				// 	.then(response => response.json())
-				// 	.then(data => {
-				// 		console.log("Installing data from github")
-				// 		let urls = data.map(form => form.url)
-				// 		urls.push(filesToCache)
-				// 		console.log("URLS: ", urls)
-				// 		return cache.addAll(urls);
-				// 	})
-				return cache.addAll(filesToCache);
+				return fetch(filesToCache[0])
+					.then(response => response.json())
+					.then(data => {
+						console.log("Installing data from github")
+						let urls = data.map(form => form.url)
+						urls.push(filesToCache[0])
+						console.log("URLS: ", urls)
+						return cache.addAll(urls);
+					})
+				// return cache.addAll(filesToCache);
 			})
 	);
 });

@@ -86,7 +86,7 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    if (currentUser) {
+    const getData = async () => {
       let rootRef = firebase.firestore().collection('users')
       let userRef = rootRef.doc(currentUser.uid)
       userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
@@ -107,6 +107,10 @@ const App = () => {
       } else {
         console.log("ERROR: no url detected")
       }
+    }
+      
+    if (currentUser) {
+      getData()
     }
   }, [])
 

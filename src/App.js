@@ -27,7 +27,6 @@ import Typography from '@material-ui/core/Typography';
 import { AuthContext } from "./util/Auth";
 import firebase from './util/Firebase';
 import { Button } from '@material-ui/core';
-const Config = require('./config_v2.json');
 
 const queryString = require('query-string');
 
@@ -91,47 +90,28 @@ const App = () => {
       let rootRef = firebase.firestore().collection('users')
       let userRef = rootRef.doc(currentUser.uid)
       userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
-      // let urlString = queryString.parse(window.location.search)
-      // if (urlString.url) {
-      //   fetch(urlString.url)
-      //     .then((response) => {
-      //       return response.json();
-      //     })
-      //     .then((data) => {
-      //       setForms(data)
-      //       let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
-      //       Promise.all(formData).then(arr => {
-      //         setData(arr)
-      //         // loadNumberOfFiles(arr)
-      //       })
-      //     });
-      // } else {
-      //   console.log("ERROR: no url detected")
-      // }
-      
-      fetch("/config_v2.json")
-        .then((response) => {
-          return response.json();
-        })
-        .then((data) => {
-          setForms(data)
-          let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
-          Promise.all(formData).then(arr => {
-            setData(arr)
-            // loadNumberOfFiles(arr)
+      let urlString = queryString.parse(window.location.search)
+      if (urlString.url) {
+        fetch(urlString.url)
+          .then((response) => {
+            return response.json();
           })
-        });
-      // let formData = Config.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
-      // Promise.all(formData).then(arr => {
-      //   setData(arr)
-      //   console.log(arr)
-      //   // loadNumberOfFiles(arr)
-      // })
+          .then((data) => {
+            setForms(data)
+            let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+            Promise.all(formData).then(arr => {
+              setData(arr)
+              // loadNumberOfFiles(arr)
+            })
+          });
+      } else {
+        console.log("ERROR: no url detected")
+      }
     }
-    console.log("YUHUHUHU")
-    // if (currentUser) {
+      
+    if (currentUser) {
       getData()
-    // }
+    }
   }, [])
 
   const timeManager = (data) => {

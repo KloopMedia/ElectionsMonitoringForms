@@ -1,0 +1,22 @@
+{
+    "main_title": "Форма по прибытию на участок / Участокко келген маалдагы форма",
+    "identifier": "form_enter",
+    "period": {
+            "start": "2020-09-08 18:00:00 GMT+6",
+            "finish": "2020-09-08 18:30:00 GMT+6",
+            "before": {"nofill": true},
+            "in": {"nofill": false},
+            "after": {"nofill": false}
+    },
+    "questions": [
+        {
+            "title": "1. Я нахожусь на участке номер / Мен номер __ участогундамын:",
+            "type": "input",
+            "attachMaterials": true
+        },
+        {
+            "title": "2. Я пришёл/пришла на участок в (указать время) / Мен участокко саат __ келдим:",
+            "type": "time"
+        }
+    ]
+}

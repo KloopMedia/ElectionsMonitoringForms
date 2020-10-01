@@ -1,0 +1,13 @@
+{
+    "filepaths": [
+        "/final_form_contacts.json",
+        "/final_form_enter.json",
+        "/final_form_morning.json",
+        "/final_form_afternoon.json",
+        "/final_form_evening.json",
+        "/final_form_emergency.json",
+        "/final_form_exit.json",
+        "/final_form_home.json",
+        "/final_form_mobile.json"
+    ]
+}

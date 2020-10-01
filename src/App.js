@@ -108,18 +108,30 @@ const App = () => {
       // } else {
       //   console.log("ERROR: no url detected")
       // }
-      console.log("CONFIG", Config)
-      let formData = Config.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
-      Promise.all(formData).then(arr => {
-        setData(arr)
-        console.log(arr)
-        // loadNumberOfFiles(arr)
-      })
-    }
       
-    if (currentUser) {
-      getData()
+      fetch("/config_v2.json")
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          setForms(data)
+          let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+          Promise.all(formData).then(arr => {
+            setData(arr)
+            // loadNumberOfFiles(arr)
+          })
+        });
+      // let formData = Config.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+      // Promise.all(formData).then(arr => {
+      //   setData(arr)
+      //   console.log(arr)
+      //   // loadNumberOfFiles(arr)
+      // })
     }
+    console.log("YUHUHUHU")
+    // if (currentUser) {
+      getData()
+    // }
   }, [])
 
   const timeManager = (data) => {

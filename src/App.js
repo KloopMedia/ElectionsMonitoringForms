@@ -150,18 +150,20 @@ const App = () => {
       </AppBar>
       <Grid container justify="center">
         <div className={classes.app}>
-          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
-            Почта: {currentUser && currentUser.email ? currentUser.email : "none"}
-          </Typography> : null}
-          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
-            Район: {currentUser && userData && userData.district ? userData.district : "none"}
-          </Typography> : null}
-          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
-            № УИК: {currentUser && userData && userData.polling_station ? userData.polling_station : "none"}
-          </Typography> : null}
-          {currentUser ? <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
-            Роль: {currentUser && userData && userData.role ? userData.role : "none"}
-          </Typography> : null}
+          {currentUser && userData ? <div>
+          <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            Почта: {currentUser.email ? currentUser.email : "отсутсвует"}
+          </Typography>
+          <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            Район: {userData.district ? userData.district : "отсутсвует"}
+          </Typography>
+          <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            № УИК: {userData.polling_station ? userData.polling_station : "отсутсвует"}
+          </Typography>
+          <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
+            Роль: {userData.role ? userData.role : "отсутсвует"}
+          </Typography>
+          </div> : null}
           <Router>
             <div>
               {currentUser ?

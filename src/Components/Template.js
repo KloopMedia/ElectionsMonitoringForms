@@ -48,7 +48,7 @@ const Template = (props) => {
       let urlString = queryString.parse(window.location.search)
       console.log(urlString)
       if (urlString.url) {
-        fetch(urlString.url)
+        fetch(`${process.env.PUBLIC_URL}/config_v2.json`)
           .then((response) => {
             console.log("RESPONSE", response)
             return response.json();
@@ -58,7 +58,7 @@ const Template = (props) => {
             data.forEach(d => {
               if (d.path === '/' + form) {
                 setForm(d)
-                fetch(d.url).then(r => r.json()).then(f => {
+                fetch(`${process.env.PUBLIC_URL}` + d.filepath).then(r => r.json()).then(f => {
                   setData(f)
                   setReady(true)
                   if (urlString.response) {

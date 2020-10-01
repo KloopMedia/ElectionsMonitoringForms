@@ -90,23 +90,37 @@ const App = () => {
       let rootRef = firebase.firestore().collection('users')
       let userRef = rootRef.doc(currentUser.uid)
       userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
-      let urlString = queryString.parse(window.location.search)
-      if (urlString.url) {
-        fetch(urlString.url)
+      // let formRef = firebase.firestore().collection('test').doc('5V0f0Z05zATMZBtUZ8iP').get().then(doc => doc.data())
+      // console.log("FORM", formRef)
+      // let urlString = queryString.parse(window.location.search)
+      // if (urlString.url) {
+      //   fetch(urlString.url)
+      //     .then((response) => {
+      //       return response.json();
+      //     })
+      //     .then((data) => {
+      //       setForms(data)
+      //       let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+      //       Promise.all(formData).then(arr => {
+      //         setData(arr)
+      //         // loadNumberOfFiles(arr)
+      //       })
+      //     });
+      // } else {
+      //   console.log("ERROR: no url detected")
+      // }
+      fetch(`${process.env.PUBLIC_URL}/config_v2.json`)
           .then((response) => {
             return response.json();
           })
           .then((data) => {
             setForms(data)
-            let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+            let formData = data.map(async d => await fetch(`${process.env.PUBLIC_URL}` + d.filepath).then(r => r.json()).then(form => form))
             Promise.all(formData).then(arr => {
               setData(arr)
               // loadNumberOfFiles(arr)
             })
           });
-      } else {
-        console.log("ERROR: no url detected")
-      }
     }
       
     if (currentUser) {

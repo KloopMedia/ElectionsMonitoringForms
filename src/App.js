@@ -27,7 +27,7 @@ import Typography from '@material-ui/core/Typography';
 import { AuthContext } from "./util/Auth";
 import firebase from './util/Firebase';
 import { Button } from '@material-ui/core';
-import Config from './config_v2.json';
+const Config = require('./config_v2.json');
 
 const queryString = require('query-string');
 

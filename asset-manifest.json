@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/ElectionsMonitoringForms/static/css/main.8eb32c48.chunk.css",
-    "main.js": "/ElectionsMonitoringForms/static/js/main.c83e65af.chunk.js",
-    "main.js.map": "/ElectionsMonitoringForms/static/js/main.c83e65af.chunk.js.map",
+    "main.js": "/ElectionsMonitoringForms/static/js/main.be3dc73b.chunk.js",
+    "main.js.map": "/ElectionsMonitoringForms/static/js/main.be3dc73b.chunk.js.map",
     "runtime-main.js": "/ElectionsMonitoringForms/static/js/runtime-main.f10c6baa.js",
     "runtime-main.js.map": "/ElectionsMonitoringForms/static/js/runtime-main.f10c6baa.js.map",
     "static/js/2.fb5c2bd4.chunk.js": "/ElectionsMonitoringForms/static/js/2.fb5c2bd4.chunk.js",
     "static/js/2.fb5c2bd4.chunk.js.map": "/ElectionsMonitoringForms/static/js/2.fb5c2bd4.chunk.js.map",
     "index.html": "/ElectionsMonitoringForms/index.html",
-    "precache-manifest.5c3ca86194083ecf7c84dcae3927a1e1.js": "/ElectionsMonitoringForms/precache-manifest.5c3ca86194083ecf7c84dcae3927a1e1.js",
+    "precache-manifest.150c46559d7144e30b25fe8065b13585.js": "/ElectionsMonitoringForms/precache-manifest.150c46559d7144e30b25fe8065b13585.js",
     "service-worker.js": "/ElectionsMonitoringForms/service-worker.js",
     "static/css/main.8eb32c48.chunk.css.map": "/ElectionsMonitoringForms/static/css/main.8eb32c48.chunk.css.map",
     "static/js/2.fb5c2bd4.chunk.js.LICENSE.txt": "/ElectionsMonitoringForms/static/js/2.fb5c2bd4.chunk.js.LICENSE.txt"
@@ -17,6 +17,6 @@
     "static/js/runtime-main.f10c6baa.js",
     "static/js/2.fb5c2bd4.chunk.js",
     "static/css/main.8eb32c48.chunk.css",
-    "static/js/main.c83e65af.chunk.js"
+    "static/js/main.be3dc73b.chunk.js"
   ]
 }

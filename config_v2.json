@@ -1,0 +1,56 @@
+[
+    {
+        "label": "Контактные данные / Байланыш маалымат",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_contacts.json",
+        "path": "/contacts",
+        "role": "all"
+    },
+    {
+        "label": "Форма по прибытию на участок / Участокко келген маалдагы форма",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_enter.json",
+        "path": "/enter",
+        "role": "all"
+    },
+    {
+        "label": "Утренняя форма для наблюдателей / Байкоочулардын эртең мененки формасы",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_morning.json",
+        "path": "/morning",
+        "role": "stationary"
+    },
+    {
+        "label": "Обеденная форма для наблюдателей / Байкоочулардын түшкү формасы",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_afternoon.json",
+        "path": "/afternoon",
+        "role": "stationary"
+    },
+    {
+        "label": "Вечерняя форма для наблюдателей / Байкоочулар үчүн кечки форма",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_evening.json",
+        "path": "/evening",
+        "role": "stationary"
+    },
+    {
+        "label": "Экстренная форма / Ыкчам формасы",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_emergency.json",
+        "path": "/emergency",
+        "role": "all"
+    },
+    {
+        "label": "Форма выхода с участка / Участоктон чыккан маалдагы форма",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_exit.json",
+        "path": "/exit",
+        "role": "all"
+    },
+    {
+        "label": "Форма прибытия домой / Үйгө келден кийинки форма",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_home.json",
+        "path": "/return",
+        "role": "all"
+    },
+    {
+        "label": "Общая форма для мобильных групп / Мобилдүү топтор үчүн жалпы форма",
+        "url": "https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/final_form_mobile.json",
+        "path": "/mobile",
+        "role": "mobile"
+    }
+]

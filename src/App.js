@@ -191,7 +191,7 @@ const App = () => {
               <Route path="/login" component={Login} />
               <Route path="/signup" component={SignUp} />
               <Route path={"/form/:form"}>
-                <Template />
+                <Template user={userData} />
               </Route>
               <Route exact path="/files" component={withRouter(FileUploader)} />
               <Route path="/files/:id" component={withRouter(FileUploader)} />

@@ -85,12 +85,12 @@ const Template = (props) => {
     const checkOnlineStatus = async () => {
       try {
         let district = ""
-        if (userData.district) {
-          district = userData.district
+        if (props.user.district) {
+          district = props.user.district
         }
         let polling_station = ""
-        if (userData.polling_station) {
-          polling_station = userData.polling_station
+        if (props.user.polling_station) {
+          polling_station = props.user.polling_station
         }
         setMessage({
           answers: shortAnswers, 

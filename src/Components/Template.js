@@ -42,9 +42,6 @@ const Template = (props) => {
     let { form } = useParams();
   
     useEffect(() => {
-      // firebase.firestore().collection('users').doc(currentUser.uid).get().then(doc => {
-      //   setUserData(doc.data())
-      // })
       let urlString = queryString.parse(window.location.search)
       console.log(urlString)
       if (urlString.url) {
@@ -77,8 +74,24 @@ const Template = (props) => {
       }
     },[])
 
+    useEffect(() => {
+      if (currentUser) {
+        let rootRef = firebase.firestore().collection('users')
+        let userRef = rootRef.doc(currentUser.uid)
+        userRef.get().then(doc => setUserData(doc.data()))
+      }
+    }, [])
+
     const checkOnlineStatus = async () => {
       try {
+        let district = ""
+        if (userData.district) {
+          district = userData.district
+        }
+        let polling_station = ""
+        if (userData.polling_station) {
+          polling_station = userData.polling_station
+        }
         setMessage({
           answers: shortAnswers, 
           form_name: data.main_title, 
@@ -86,7 +99,8 @@ const Template = (props) => {
           identifier: data.identifier, 
           user_id: currentUser.uid, 
           user_email: currentUser.email,
-          // polling_station: userData.polling_station
+          polling_station: polling_station,
+          district: district
         })
         const online = await fetch("https://raw.githubusercontent.com/KloopMedia/ElectionsMonitoringFormsConfig/master/config.json", {cache: "no-store"})
         .then(r => {
@@ -106,6 +120,14 @@ const Template = (props) => {
   
     const uploadData = async () => {
       try {
+        let district = ""
+        if (userData.district) {
+          district = userData.district
+        }
+        let polling_station = ""
+        if (userData.polling_station) {
+          polling_station = userData.polling_station
+        }
         let rootRef = firebase.firestore().collection("responses")
         let userRef = rootRef.doc(currentUser.uid)
         userRef.set({email: currentUser.email})
@@ -119,7 +141,8 @@ const Template = (props) => {
             date: new Date(),
             user_id: currentUser.uid,
             user_email: currentUser.email,
-            // polling_station: userData.polling_station
+            polling_station: polling_station,
+            district: district
           }
         ).then(doc => {
           setSnackbar(true)

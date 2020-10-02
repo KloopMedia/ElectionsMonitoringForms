@@ -19,13 +19,13 @@ const FileUploader = (props) => {
   const [fullAnswers, setAnswers] = useState({})
   const [locked, setLocked] = useState(false)
   const [snackbar, setSnackbar] = useState(false)
-  const [noAttachments, setNo] = useState(true)
   const [inputs, setInputs] = useState([])
   const [formId, setId] = useState(null)
   const [spinner, setSpinner] = useState(false)
   const [progress, setProgress] = useState(0)
   const [formAnswer, setFormAnswer] = useState(null)
   const [userData, setUserData] = useState(null)
+  const [pollingStation, setPollingStation] = useState(null)
 
   const { currentUser } = useContext(AuthContext);
   let { id } = useParams();
@@ -39,10 +39,15 @@ const FileUploader = (props) => {
     loadAttachmentQuestions()
   }, [])
 
+  useEffect(() => {
+    if (currentUser) {
+      let rootRef = firebase.firestore().collection('users')
+      let userRef = rootRef.doc(currentUser.uid)
+      userRef.get().then(doc => setUserData(doc.data()))
+    }
+  }, [])
+
   const loadAttachmentQuestions = () => {
-    // firebase.firestore().collection('users').doc(currentUser.uid).get().then(doc => {
-    //   setUserData(doc.data())
-    // })
     let rootRef = firebase.firestore().collection('responses')
     let userRef = rootRef.doc(currentUser.uid)
     let answersRef = userRef.collection("answers")
@@ -50,6 +55,15 @@ const FileUploader = (props) => {
       answersRef.doc(id).get().then(doc => {
         setAnswers(doc.data().answers)
         setId(doc.id)
+        if (doc.data().identifier === "form_mobile") {
+          console.log("UIK NUMBER", doc.data().answers[0])
+          if (doc.data().answers[0]) {
+            setPollingStation(doc.data().answers[0])
+          }
+          else {
+            setPollingStation("")
+          }
+        }
         downloadData(doc.data())
         setFormAnswer(doc.data())
       })
@@ -61,6 +75,15 @@ const FileUploader = (props) => {
           if (doc && doc.exists) {
             setAnswers(doc.data().answers)
             setId(doc.id)
+            if (doc.data().identifier === "form_mobile") {
+              console.log("UIK NUMBER", doc.data().answers[0])
+              if (doc.data().answers[0]) {
+                setPollingStation(doc.data().answers[0])
+              }
+              else {
+                setPollingStation("")
+              }
+            }
             downloadData(doc.data())
             setFormAnswer(doc.data())
           }
@@ -148,6 +171,15 @@ const FileUploader = (props) => {
 
   const uploadFiles = () => {
     const storageRef = firebase.storage().ref().child(currentUser.uid);
+    let polling_station = userData.polling_station
+    if (data.identifier === 'form_mobile') {
+      polling_station = pollingStation
+    }
+    let district = ""
+      if (userData.district) {
+        district = userData.district
+    }
+    console.log(polling_station)
     let filesCount = 0
     setProgress(0)
     setSpinner(true)
@@ -184,7 +216,8 @@ const FileUploader = (props) => {
                 user_id: currentUser.uid,
                 user_email: currentUser.email,
                 form_url: formAnswer.form_url,
-                // polling_station: userData.polling_station
+                polling_station: polling_station,
+                district: district
               }
             ).then(() => setSpinner(false)).catch(error => alert(error))
           })
@@ -200,7 +233,7 @@ const FileUploader = (props) => {
         console.log("Файл отправлен")
         filesRef.add(
           {
-            filepath: value.url,
+            public_url: value.url,
             answer_number: value.index,
             answer_id: formId,
             answer_subnumber: value.subindex,
@@ -210,7 +243,8 @@ const FileUploader = (props) => {
             user_id: currentUser.uid,
             user_email: currentUser.email,
             form_url: formAnswer.form_url,
-            // polling_station: userData.polling_station
+            polling_station: polling_station,
+            district: district
           }
         ).then(() => setSpinner(false)).catch(error => alert(error))
       }

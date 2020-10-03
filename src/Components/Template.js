@@ -120,6 +120,7 @@ const Template = (props) => {
   
     const uploadData = async () => {
       try {
+        
         let district = ""
         if (userData.district) {
           district = userData.district
@@ -128,9 +129,19 @@ const Template = (props) => {
         if (userData.polling_station) {
           polling_station = userData.polling_station
         }
+        let geolocation = ""
+        if ("geolocation" in navigator) {
+          await getLocation()
+          .then(position => geolocation = position)
+          .catch(error => geolocation = error)
+        } else {
+          geolocation = "Not Available"
+        }
+
+        console.log(geolocation)
+
         let rootRef = firebase.firestore().collection("responses")
         let userRef = rootRef.doc(currentUser.uid)
-        userRef.set({email: currentUser.email})
         let answersRef = userRef.collection("answers")
         answersRef.add(
           {
@@ -142,7 +153,8 @@ const Template = (props) => {
             user_id: currentUser.uid,
             user_email: currentUser.email,
             polling_station: polling_station,
-            district: district
+            district: district,
+            geolocation: geolocation
           }
         ).then(doc => {
           setSnackbar(true)
@@ -158,6 +170,23 @@ const Template = (props) => {
         alert(err)
         setShowAnswers(true)
       }
+    }
+
+    const getLocation = () => {
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          position => {
+            resolve({
+              timestamp: position.timestamp, 
+              latitude : position.coords.latitude, 
+              longitude : position.coords.longitude
+            })
+          },
+          error => {
+            reject(error.message)
+          }
+        );
+      });
     }
 
     const timeManager = (data) => {

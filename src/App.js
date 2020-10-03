@@ -173,13 +173,13 @@ const App = () => {
           <Typography variant="body1" style={{ color: '#003366', paddingLeft: 5, paddingRight: 5 }}>
             Роль: {userData.role ? userData.role : "отсутсвует"}
           </Typography>
-          </div> : null}
           <Typography variant="body1" style={{ color: 'red', paddingLeft: 5, paddingRight: 5 }}>
             Скачать: <a href={process.env.PUBLIC_URL + '/Бланк_Клооп_Заявление_о_нарушении_русский_язык.docx'} alt="download_RU" download>заявление о нарушении (Русский)</a>
           </Typography>
           <Typography variant="body1" style={{ color: 'red', paddingLeft: 5, paddingRight: 5 }}>
             Скачать: <a href={process.env.PUBLIC_URL + '/Кыргызча_Заявление_о_нарушении_русский_язык.docx'} alt="download_KG" download>заявление о нарушении (Кыргызча)</a>
           </Typography>
+          </div> : null}
           <Router>
             <div>
               {currentUser ?

@@ -19,36 +19,36 @@ const queryString = require('query-string');
 
 
 const Home = (props) => {
-  const [forms, setForms] = useState([])
-  const [numbers, setNumbers] = useState({})
-  const [formData, setData] = useState(null)
-  const [role, setRole] = useState(null)
+  // const [forms, setForms] = useState([])
+  // const [numbers, setNumbers] = useState({})
+  // const [formData, setData] = useState(null)
+  // const [role, setRole] = useState(null)
 
-  const { currentUser } = useContext(AuthContext);
+  // const { currentUser } = useContext(AuthContext);
   let { path, url } = useRouteMatch();
   
-  useEffect(() => {
-    let rootRef = firebase.firestore().collection('users')
-    let userRef = rootRef.doc(currentUser.uid)
-    userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
-    let urlString = queryString.parse(window.location.search)
-		if (urlString.url) {
-			fetch(urlString.url)
-				.then((response) => {
-					return response.json();
-				})
-				.then((data) => {
-          setForms(data)
-          let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
-          Promise.all(formData).then(arr => {
-            setData(arr)
-            // loadNumberOfFiles(arr)
-          })
-				});
-		} else {
-			console.log("ERROR: no url detected")
-		}
-  },[])
+  // useEffect(() => {
+  //   let rootRef = firebase.firestore().collection('users')
+  //   let userRef = rootRef.doc(currentUser.uid)
+  //   userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
+  //   let urlString = queryString.parse(window.location.search)
+	// 	if (urlString.url) {
+	// 		fetch(urlString.url)
+	// 			.then((response) => {
+	// 				return response.json();
+	// 			})
+	// 			.then((data) => {
+  //         setForms(data)
+  //         let formData = data.map(async d => await fetch(d.url).then(r => r.json()).then(form => form))
+  //         Promise.all(formData).then(arr => {
+  //           setData(arr)
+  //           // loadNumberOfFiles(arr)
+  //         })
+	// 			});
+	// 	} else {
+	// 		console.log("ERROR: no url detected")
+	// 	}
+  // },[])
 
   // Количество отправленных файлов
   // const loadNumberOfFiles = (d) => {
@@ -96,7 +96,7 @@ const Home = (props) => {
   return (
     <>
     <br />
-     {formData && role ? <div>
+     <div>
      {/* <ul>
       {forms.map((el, i) => {
         return timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
@@ -122,11 +122,8 @@ const Home = (props) => {
         <Route exact path={path}>
           <History />
         </Route>
-        {/* <Route path={path + "/:form"}>
-          <Template />
-        </Route> */}
       </Switch>
-      </div> : null}
+      </div>
             
     </>
   );

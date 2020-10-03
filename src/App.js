@@ -68,9 +68,7 @@ const useStyles = makeStyles(theme => ({
 const App = () => {
   const [userData, setUserData] = useState(null)
   const [forms, setForms] = useState([])
-  const [numbers, setNumbers] = useState({})
   const [formData, setData] = useState(null)
-  const [role, setRole] = useState(null)
   const [isMain, setMain] =useState(true)
 
   const { currentUser } = useContext(AuthContext);
@@ -87,9 +85,6 @@ const App = () => {
 
   useEffect(() => {
     const getData = async () => {
-      let rootRef = firebase.firestore().collection('users')
-      let userRef = rootRef.doc(currentUser.uid)
-      userRef.get().then(doc => doc.data().role ? setRole(doc.data().role) : setRole("independent"))
       let urlString = queryString.parse(window.location.search)
       if (urlString.url) {
         fetch(urlString.url)
@@ -133,6 +128,21 @@ const App = () => {
     }
   }
 
+  const returnForms = () => {
+    return forms.map((form, i) => {
+      if ((userData.role === form.role || form.role === 'all' || userData.role || 'moderator') && !timeManager(formData[i])) {
+        return (
+          <li key={i} style={{ padding: 5 }}>
+            <Link style={{ textDecoration: 'none' }} to={'/form' + form.path} onClick={() => setMain(false)}>{form.label}</Link>
+          </li>
+        )
+      }
+      else {
+        return null
+      }
+    })
+  }
+
   return (
     <div>
       <AppBar position="static" className={classes.appbar}>
@@ -164,6 +174,12 @@ const App = () => {
             Роль: {userData.role ? userData.role : "отсутсвует"}
           </Typography>
           </div> : null}
+          <Typography variant="body1" style={{ color: 'red', paddingLeft: 5, paddingRight: 5 }}>
+            Скачать: <a href={process.env.PUBLIC_URL + '/Бланк_Клооп_Заявление_о_нарушении_русский_язык.docx'} alt="download_RU" download>заявление о нарушении (Русский)</a>
+          </Typography>
+          <Typography variant="body1" style={{ color: 'red', paddingLeft: 5, paddingRight: 5 }}>
+            Скачать: <a href={process.env.PUBLIC_URL + '/Кыргызча_Заявление_о_нарушении_русский_язык.docx'} alt="download_KG" download>заявление о нарушении (Кыргызча)</a>
+          </Typography>
           <Router>
             <div>
               {currentUser ?
@@ -175,16 +191,11 @@ const App = () => {
                     <li style={{ padding: 5 }}>
                       <Link style={{ textDecoration: 'none' }} to={"/files"} onClick={() => setMain(false)}>Форма для отправки файлов / Файл жөнөтүү үчүн форма</Link>
                     </li>
-                    {isMain && formData && role ? <div>
-                    {forms.map((el, i) => {
-                      return  timeManager(formData[i]) ? null : role === el.role || el.role === 'all' || role === 'moderator' ?
-                        <li key={i} style={{ padding: 5 }}>
-                          <Link style={{ textDecoration: 'none' }} to={'/form' + el.path} onClick={() => setMain(false)}>{el.label}</Link>
-                        </li> : null
-                    })}
+                    {isMain && formData && userData ? <div>
+                    {returnForms()}
                     </div> : null}
-          </ul>
-        </nav> : <Redirect to={"/login"} />}
+              </ul>
+            </nav> : <Redirect to={"/login"} />}
 
           <Switch>
               <PrivateRoute exact path={"/form"} component={Home} />

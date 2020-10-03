@@ -149,7 +149,11 @@ const FileUploader = (props) => {
 
 
   const uploadFilesData = async (filename, url, index, subindex, textInput ) => {
-    let polling_station = userData.polling_station
+    let polling_station = ""
+    if (userData.polling_station) {
+      polling_station = userData.polling_station
+    }
+    
     if (data.identifier === 'form_mobile') {
       polling_station = pollingStation
     }

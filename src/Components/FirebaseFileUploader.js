@@ -3,7 +3,8 @@ import React, {useContext, useState, forwardRef, useImperativeHandle} from 'reac
 import CircularProgress from '@material-ui/core/CircularProgress'
 import FileUploader from "react-firebase-file-uploader";
 import Typography from '@material-ui/core/Typography'
-import { Grid } from '@material-ui/core';
+import { Grid, Box } from '@material-ui/core';
+import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 
 import firebase from '../util/Firebase';
 import LinearProgressWithLabel from './LinearProgressWithLabel'
@@ -18,6 +19,7 @@ const FirebaseFileUploader = forwardRef((props, ref) => {
     const [progress, setProgress] = useState(0)
     const [inputText, setInputText] = useState(null)
     const [isUploading, setUploading] = useState(false)
+    const [success, setSuccess] = useState(false)
 
     let uploader = null;
 
@@ -53,6 +55,7 @@ const FirebaseFileUploader = forwardRef((props, ref) => {
             else if (inputText) {
                 props.uploadFilesData(null, null, index, subindex, inputText)
                 setProgress(100)
+                setSuccess(true)
             }
         }
     
@@ -62,6 +65,7 @@ const FirebaseFileUploader = forwardRef((props, ref) => {
     const handleUploadStart = () => {
         setProgress(0)
         setUploading(true)
+        setSuccess(false)
     }
 
     const handleUploadError = error => {
@@ -79,6 +83,7 @@ const FirebaseFileUploader = forwardRef((props, ref) => {
      
         setProgress(100)
         setUploading(false)
+        setSuccess(true)
         props.uploadFilesData(filename, downloadURL, index, subindex, null)
       };
     
@@ -106,7 +111,10 @@ const FirebaseFileUploader = forwardRef((props, ref) => {
         </Grid>
         <Grid style={{paddingTop: 20}}>
             {isUploading ? <CircularProgress /> : null}
-            <LinearProgressWithLabel value={progress} />
+            <Grid container display="flex" alignItems="center">
+                <Box flexGrow={1} alignItems="center"><LinearProgressWithLabel value={progress} /></Box>
+                {success ? <CheckCircleOutlineIcon fontSize="large" style={{ color: 'green' }} /> : null}
+            </Grid>
         </Grid>
       </div>
     )
